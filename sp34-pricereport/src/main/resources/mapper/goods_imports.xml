@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="goods_imports">
+
+    <sql id="sql_where">
+        <if test="''!=goodsclass and null!=goodsclass">
+            and a.goodsclass like CONCAT('%', #{goodsclass}, '%')
+        </if>
+        <if test="''!=goodname and null!=goodname">
+            and a.goodname like CONCAT('%', #{goodname}, '%')
+        </if>
+
+        <if test="''!=factory and null!=factory">
+            and a.factory like CONCAT('%', #{factory}, '%')
+        </if>
+
+        <if test="''!=lowactivePriceRate and null!=lowactivePriceRate  and ''!=highactivePriceRate and null!=highactivePriceRate">
+            and a.activePrice&gt;=#{lowactivePriceRate} and a.activePrice &lt;= #{highactivePriceRate}
+        </if>
+
+
+        <if test="''!=id and null!=id">
+            and a.id=#{id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        CONCAT_WS('->',a.Factoryprice,a.Factoryprice*(1+#{FactorypriceRate})) AS AFactoryPrice,round(a.Factoryprice*(1+#{FactorypriceRate}),2) as BFactoryPrice,  a.*
+        FROM
+        goods_imports a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+        order by a.id asc
+
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time desc
+        </if>
+
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+
+        SELECT count(1) as total
+        FROM
+        goods_imports a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        <include refid="sql_where"/>
+    </select>
+
+    <select id="getInfo" parameterType="map" resultType="dto">
+
+        SELECT
+        a.*
+        FROM
+        goods_imports a
+        WHERE a.is_delete = 'N'
+        <include refid="sql_where"/>
+        LIMIT 1
+
+
+    </select>
+
+
+    <!-- 插入 -->
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO goods_imports
+        (
+        <if test="goodsclass!=null and ''!=goodsclass">
+            goodsclass,
+        </if>
+        <if test="goodname!=null and ''!=goodname">
+            goodname,
+        </if>
+        <if test="specification!=null and ''!=specification">
+            specification,
+        </if>
+        <if test="unit!=null and ''!=unit">
+            unit,
+        </if>
+        <if test="Factoryprice!=null and ''!=Factoryprice">
+            Factoryprice,
+        </if>
+        <if test="retailprice!=null and ''!=retailprice">
+            retailprice,
+        </if>
+        <if test="activePrice!=null and ''!=activePrice">
+            activePrice,
+        </if>
+        <if test="Shelflife!=null and ''!=Shelflife">
+            Shelflife,
+        </if>
+        <if test="factory!=null and ''!=factory">
+            factory,
+        </if>
+        <if test="goodspicture!=null and ''!=goodspicture">
+            goodspicture,
+        </if>
+        <if test="num!=null and ''!=num">
+            num,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+         <if test="updator!=null and ''!=updator">
+             updator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="goodsclass!=null and ''!=goodsclass">
+            #{goodsclass},
+        </if>
+        <if test="goodname!=null and ''!=goodname">
+            #{goodname},
+        </if>
+        <if test="specification!=null and ''!=specification">
+            #{specification},
+        </if>
+        <if test="unit!=null and ''!=unit">
+            #{unit},
+        </if>
+        <if test="Factoryprice!=null and ''!=Factoryprice">
+            #{Factoryprice},
+        </if>
+        <if test="retailprice!=null and ''!=retailprice">
+            #{retailprice},
+        </if>
+        <if test="activePrice!=null and ''!=activePrice">
+            #{activePrice},
+        </if>
+        <if test="Shelflife!=null and ''!=Shelflife">
+            #{Shelflife},
+        </if>
+        <if test="factory!=null and ''!=factory">
+            #{factory},
+        </if>
+        <if test="goodspicture!=null and ''!=goodspicture">
+            #{goodspicture},
+        </if>
+        <if test="num!=null and ''!=num">
+            #{num},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        <if test="updator!=null and ''!=updator">
+            #{updator},
+        </if>
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update goods_imports a
+        set
+        <if test="''!=goodsclass and null!=goodsclass">
+            a.goodsclass=#{goodsclass},
+        </if>
+        <if test="''!=goodname and null!=goodname">
+            a.goodname=#{goodname},
+        </if>
+        <if test="''!=specification and null!=specification">
+            a.specification=#{specification},
+        </if>
+        <if test="''!=unit and null!=unit">
+            a.unit=#{unit},
+        </if>
+        <if test="''!=Factoryprice and null!=Factoryprice">
+            a.Factoryprice=#{Factoryprice},
+        </if>
+        <if test="''!=retailprice and null!=retailprice">
+            a.retailprice=#{retailprice},
+        </if>
+        <if test="''!=activePrice and null!=activePrice">
+            a.activePrice=#{activePrice},
+        </if>
+
+        <if test="''!=Shelflife and null!=Shelflife">
+            a.Shelflife=#{Shelflife},
+        </if>
+        <if test="''!=factory and null!=factory">
+            a.factory=#{factory},
+        </if>
+        <if test="''!=goodspicture and null!=goodspicture">
+            a.goodspicture=#{goodspicture},
+        </if>
+        <if test="''!=num and null!=num">
+            a.num=#{num},
+        </if>
+        a.update_time = now()
+        where
+        <if test="''!=id and null!=id">
+            a.id=#{id}
+        </if>
+
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        update  goods_imports set is_delete='Y', update_time=now()  where id = #{id}
+    </delete>
+
+
+    <!-- 删除 -->
+    <delete id="deleteTrueInfo" parameterType="map">
+        delete from goods_imports  where updator = #{updator}
+    </delete>
+</mapper>

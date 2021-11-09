@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_quiz_question">
+
+    <sql id="sql_where">
+        <if test="''!=quizID and null!=quizID">
+            and a.quizID=#{quizID}
+        </if>
+        <if test="''!=QuestionSortNum and null!=QuestionSortNum">
+            and a.QuestionSortNum=#{QuestionSortNum}
+        </if>
+
+
+        <if test="''!=content and null!=content">
+            and a.content like CONCAT('%', #{content}, '%')
+        </if>
+        <if test="''!=ShortDes and null!=ShortDes">
+            and a.ShortDes like CONCAT('%', #{ShortDes}, '%')
+        </if>
+        <if test="''!=questiontype and null!=questiontype">
+            and a.questiontype like CONCAT('%', #{questiontype}, '%')
+        </if>
+        <if test="''!=AnswerDec and null!=AnswerDec">
+            and a.AnswerDec like CONCAT('%', #{AnswerDec}, '%')
+        </if>
+
+        <if test="''!=id and null!=id">
+            and a.id=#{id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_question a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+
+        order by a.QuestionSortNum asc, a.id asc
+
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time asc
+        </if>
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+
+        SELECT count(1) as total
+        FROM
+        invest_quiz_question a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        <include refid="sql_where"/>
+    </select>
+
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_question a
+        WHERE a.is_delete = 'N'
+        <include refid="sql_where"/>
+        LIMIT 1
+    </select>
+
+    <!-- 插入 -->
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_quiz_question
+        (
+        <if test="quizID!=null and ''!=quizID">
+            quizID,
+        </if>
+        <if test="QuestionSortNum!=null and ''!=QuestionSortNum">
+            QuestionSortNum,
+        </if>
+
+        <if test="content!=null and ''!=content">
+            content,
+        </if>
+        <if test="Picture!=null and ''!=Picture">
+            Picture,
+        </if>
+        <if test="ShortDes!=null and ''!=ShortDes">
+            ShortDes,
+        </if>
+        <if test="quiz_question_Status!=null and ''!=quiz_question_Status">
+            quiz_question_Status,
+        </if>
+        <if test="questiontype!=null and ''!=questiontype">
+            questiontype,
+        </if>
+        <if test="Score!=null and ''!=Score">
+            Score,
+        </if>
+        <if test="AnswerDec!=null and ''!=AnswerDec">
+            AnswerDec,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="quizID!=null and ''!=quizID">
+            #{quizID},
+        </if>
+        <if test="QuestionSortNum!=null and ''!=QuestionSortNum">
+            #{QuestionSortNum},
+        </if>
+
+        <if test="content!=null and ''!=content">
+            #{content},
+        </if>
+        <if test="Picture!=null and ''!=Picture">
+            #{Picture},
+        </if>
+        <if test="ShortDes!=null and ''!=ShortDes">
+            #{ShortDes},
+        </if>
+        <if test="quiz_question_Status!=null and ''!=quiz_question_Status">
+            #{quiz_question_Status},
+        </if>
+        <if test="questiontype!=null and ''!=questiontype">
+            #{questiontype},
+        </if>
+        <if test="Score!=null and ''!=Score">
+            #{Score},
+        </if>
+        <if test="AnswerDec!=null and ''!=AnswerDec">
+            #{AnswerDec},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_quiz_question a
+        set
+        <if test="''!=quizID and null!=quizID">
+            a.quizID=#{quizID},
+        </if>
+        <if test="''!=QuestionSortNum and null!=QuestionSortNum">
+            a.QuestionSortNum=#{QuestionSortNum},
+        </if>
+
+        <if test="''!=content and null!=content">
+            a.content=#{content},
+        </if>
+        <if test="''!=Picture and null!=Picture">
+            a.Picture=#{Picture},
+        </if>
+        <if test="''!=ShortDes and null!=ShortDes">
+            a.ShortDes=#{ShortDes},
+        </if>
+        <if test="''!=quiz_question_Status and null!=quiz_question_Status">
+            a.quiz_question_Status=#{quiz_question_Status},
+        </if>
+        <if test="''!=questiontype and null!=questiontype">
+            a.questiontype=#{questiontype},
+        </if>
+        <if test="''!=Score and null!=Score">
+            a.Score=#{Score},
+        </if>
+        <if test="''!=AnswerDec and null!=AnswerDec">
+            a.AnswerDec=#{AnswerDec},
+        </if>
+        <if test="''!=creator and null!=creator">
+            a.creator=#{creator},
+        </if>
+        a.update_time = now()
+        where
+        <if test="''!=id and null!=id">
+            a.id=#{id}
+        </if>
+
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        update invest_quiz_question set is_delete='Y',update_time=now() where id = #{id}
+    </delete>
+    <!-- 审核 -->
+    <update id="updateOnlineStatus" parameterType="dto">
+        update invest_quiz_question set quiz_question_Status = #{quiz_question_Status} where id = #{id}
+    </update>
+
+
+    <!-- 查询 -->
+    <select id="queryQuizList" parameterType="map" resultType="dto">
+        SELECT
+        a.id,a.title
+        FROM
+        invest_quiz a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        order by
+        a.id asc
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time desc
+        </if>
+
+        <if test="null!=end">
+            limit ${start},${end}
+        </if>
+    </select>
+</mapper>

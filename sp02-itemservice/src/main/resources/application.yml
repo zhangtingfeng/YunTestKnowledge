@@ -1,0 +1,22 @@
+# ע�����
+#ddd
+#��ǰ��������
+spring:
+  application:
+    name: item-service
+  # 链路追踪
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1 # 默认是0.1 也就是采样请求10%
+
+server:
+  port: 8001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka1:2001/eureka,http://eureka2:2002/eureka
+      fetch-registry: true
+      register-with-eureka: true

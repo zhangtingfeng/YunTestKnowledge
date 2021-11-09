@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 参数管理手工映射SQL语句 -->
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_quiz_user_answer">
+
+
+    <sql id="sql_where">
+        <if test="null!=invest_quiz_userID  and ''!= invest_quiz_userID">
+            and a.invest_quiz_userID = #{invest_quiz_userID}
+        </if>
+        <if test="null!=answer  and ''!= answer">
+            and a.answer = #{answer}
+        </if>
+        <if test="null!=answered  and ''!= answered">
+            and a.answered = #{answered}
+        </if>
+        <if test="null!=invest_quiz_questionID  and ''!= invest_quiz_questionID">
+            and a.invest_quiz_questionID = #{invest_quiz_questionID}
+        </if>
+
+    </sql>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        UPDATE invest_quiz_user_answer set is_delete = 'Y' WHERE id = #{id}
+    </delete>
+
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM invest_quiz_user_answer a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        limit 0,1
+    </select>
+
+
+    <select id="queryAutoUser" resultType="dto">
+        SELECT a.* from invest_quiz_user_answer a
+        WHERE a.is_delete = 'N'
+        order by a.id desc
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_user_answer a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        ORDER BY a.id asc
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(a.id) as total
+        FROM invest_quiz_user_answer a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_quiz_user_answer
+        (
+        <if test="invest_quiz_userID!=null and ''!=invest_quiz_userID">
+            invest_quiz_userID,
+        </if>
+        <if test="answer!=null and ''!=answer">
+            answer,
+        </if>
+        <if test="answered!=null and ''!=answered">
+            answered,
+        </if>
+        <if test="invest_quiz_questionID!=null and ''!=invest_quiz_questionID">
+            invest_quiz_questionID,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="invest_quiz_userID!=null and ''!=invest_quiz_userID">
+            #{invest_quiz_userID},
+        </if>
+        <if test="answer!=null and ''!=answer">
+            #{answer},
+        </if>
+        <if test="answered!=null and ''!=answered">
+            #{answered},
+        </if>
+        <if test="invest_quiz_questionID!=null and ''!=invest_quiz_questionID">
+            #{invest_quiz_questionID},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+
+
+    </insert>
+
+
+    <!-- 批量生成试图插入 -->
+    <insert id="batchInsertInfo" parameterType="dto">
+
+        insert into invest_quiz_user_answer
+        (id,sort,invest_quiz_userID,invest_quiz_questionID,create_time)
+        select @i:=@i+1 as id,@sort:=@sort+1 as sort, #{invest_quiz_userID} ,t.questionID,now()
+        from
+        (select t.id questionID
+        from invest_quiz_question t
+        WHERE quizID= #{quizID} and quiz_question_Status='online' order by QuestionSortNum asc,id asc) t
+        ,(SELECT @sort :=0) r,
+        (SELECT @i :=(select ifnull(max(a.id),0) from invest_quiz_user_answer a)) q;
+    </insert>
+
+
+    <!-- 批量 查询 题目-->
+    <select id="batchqueryQustrionList" parameterType="map" resultType="dto">
+        SELECT invest_quiz_user_answer.*,
+        invest_quiz_question.quizID,
+        invest_quiz_question.ClassID,
+        invest_quiz_question.ShortDes,
+        invest_quiz_question.content,
+        invest_quiz_question.Picture,
+        invest_quiz_question.questiontype,
+        invest_quiz_question.quiz_question_Status ,
+        invest_quiz_question.Score,
+        invest_quiz_question.AnswerDec
+        FROM invest_quiz_user_answer LEFT JOIN invest_quiz_question on
+        invest_quiz_user_answer.invest_quiz_questionID=invest_quiz_question.id
+        where invest_quiz_user_answer.invest_quiz_userID=#{invest_quiz_userID}
+        <if test="answered!=null and ''!=answered">
+            and invest_quiz_user_answer.answered=#{answered}
+        </if>
+    </select>
+
+
+    <!-- 批量 查询 选项-->
+    <select id="batchqueryChoicedList" parameterType="map" resultType="dto">
+        SELECT invest_quiz_question_choice.*,
+        invest_quiz_user_answer.invest_quiz_userID,
+        invest_quiz_user_answer.invest_quiz_questionID
+        FROM invest_quiz_question_choice LEFT JOIN invest_quiz_user_answer on
+        invest_quiz_user_answer.invest_quiz_questionID=invest_quiz_question_choice.quiz_questionID
+        where invest_quiz_question_choice.Status='online'
+        and invest_quiz_user_answer.invest_quiz_userID=#{testquizID}
+        and invest_quiz_user_answer.answered='Y'
+    </select>
+
+
+    <!-- 批量 查询 选项-->
+    <select id="batchqueryChoiceList" parameterType="map" resultType="dto">
+        SELECT invest_quiz_question_choice.*,
+        invest_quiz_user_answer.invest_quiz_userID,
+        invest_quiz_user_answer.invest_quiz_questionID
+        FROM invest_quiz_question_choice LEFT JOIN invest_quiz_user_answer on
+        invest_quiz_user_answer.invest_quiz_questionID=invest_quiz_question_choice.quiz_questionID
+        where invest_quiz_question_choice.Status='online'
+        and invest_quiz_user_answer.invest_quiz_userID=#{invest_quiz_userID}
+        <if test="answered!=null and ''!=answered">
+            and invest_quiz_user_answer.answered=#{answered}
+        </if>
+
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_quiz_user_answer
+        set
+        <if test="null!=invest_quiz_userID  and ''!= invest_quiz_userID">
+            invest_quiz_userID = #{invest_quiz_userID},
+        </if>
+        <if test="null!=answer  and ''!= answer">
+            answer = #{answer},
+        </if>
+        <if test="null!=answered  and ''!= answered">
+            answered = #{answered},
+        </if>
+        <if test="null!=invest_quiz_questionID  and ''!= invest_quiz_questionID">
+            invest_quiz_questionID = #{invest_quiz_questionID},
+        </if>
+        <if test="null!=creator  and ''!= creator">
+            creator = #{creator},
+        </if>
+
+
+        update_time = now(),
+        updator = #{updator}
+        where id = #{id}
+    </update>
+
+
+</mapper>

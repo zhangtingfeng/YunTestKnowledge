@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_quiz_question_choice">
+
+    <sql id="sql_where">
+        <if test="''!=quiz_questionID and null!=quiz_questionID">
+            and a.quiz_questionID=#{quiz_questionID}
+        </if>
+        <if test="''!=AnswerSortNum and null!=AnswerSortNum">
+            and a.AnswerSortNum=#{AnswerSortNum}
+        </if>
+
+
+        <if test="''!=answertext and null!=answertext">
+            and a.answertext like CONCAT('%', #{answertext}, '%')
+        </if>
+        <if test="''!=content and null!=content">
+            and a.content like CONCAT('%', #{content}, '%')
+        </if>
+
+
+        <if test="''!=correctAnswerScore and null!=correctAnswerScore">
+            and a.correctAnswerScore=#{correctAnswerScore}
+        </if>
+
+        <if test="''!=Status and null!=Status">
+            and a.Status=#{Status}
+        </if>
+
+        <if test="''!=AnswerMemo and null!=AnswerMemo">
+            and a.AnswerMemo like CONCAT('%', #{AnswerMemo}, '%')
+        </if>
+
+        <if test="''!=id and null!=id">
+            and a.id=#{id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_question_choice a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+
+        order by a.AnswerSortNum asc
+        ,a.id asc
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time desc
+        </if>
+
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+
+        SELECT count(1) as total
+        FROM
+        invest_quiz_question_choice a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        <include refid="sql_where"/>
+    </select>
+
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT
+        a.*,ifnull(correctAnswerScore,0) as aCorrectAnswerScore
+        FROM
+        invest_quiz_question_choice a
+        WHERE a.is_delete = 'N'
+        <include refid="sql_where"/>
+        LIMIT 1
+    </select>
+
+    <!-- 插入 -->
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_quiz_question_choice
+        (
+        <if test="quiz_questionID!=null and ''!=quiz_questionID">
+            quiz_questionID,
+        </if>
+        <if test="AnswerSortNum!=null and ''!=AnswerSortNum">
+            AnswerSortNum,
+        </if>
+
+        <if test="answertext!=null and ''!=answertext">
+            answertext,
+        </if>
+        <if test="content!=null and ''!=content">
+            content,
+        </if>
+        <if test="Picture!=null and ''!=Picture">
+            picture,
+        </if>
+        <if test="correctAnswerScore!=null and ''!=correctAnswerScore">
+            correctAnswerScore,
+        </if>
+        <if test="Status!=null and ''!=Status">
+            Status,
+        </if>
+        <if test="AnswerMemo!=null and ''!=AnswerMemo">
+            AnswerMemo,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="quiz_questionID!=null and ''!=quiz_questionID">
+            #{quiz_questionID},
+        </if>
+        <if test="AnswerSortNum!=null and ''!=AnswerSortNum">
+            #{AnswerSortNum},
+        </if>
+
+        <if test="answertext!=null and ''!=answertext">
+            #{answertext},
+        </if>
+        <if test="content!=null and ''!=content">
+            #{content},
+        </if>
+        <if test="Picture!=null and ''!=Picture">
+            #{Picture},
+        </if>
+        <if test="correctAnswerScore!=null and ''!=correctAnswerScore">
+            #{correctAnswerScore},
+        </if>
+        <if test="Status!=null and ''!=Status">
+            #{Status},
+        </if>
+        <if test="AnswerMemo!=null and ''!=AnswerMemo">
+            #{AnswerMemo},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_quiz_question_choice a
+        set
+        <if test="''!=quiz_questionID and null!=quiz_questionID">
+            a.quiz_questionID=#{quiz_questionID},
+        </if>
+        <if test="''!=AnswerSortNum and null!=AnswerSortNum">
+            a.AnswerSortNum=#{AnswerSortNum},
+        </if>
+
+        <if test="''!=answertext and null!=answertext">
+            a.answertext=#{answertext},
+        </if>
+        <if test="''!=content and null!=content">
+            a.content=#{content},
+        </if>
+        <if test="''!=Picture and null!=Picture">
+            a.Picture=#{Picture},
+        </if>
+        <if test="''!=correctAnswerScore and null!=correctAnswerScore">
+            a.correctAnswerScore=#{correctAnswerScore},
+        </if>
+        <if test="''!=Status and null!=Status">
+            a.Status=#{Status},
+        </if>
+        <if test="''!=AnswerMemo and null!=AnswerMemo">
+            a.AnswerMemo=#{AnswerMemo},
+        </if>
+        <if test="''!=creator and null!=creator">
+            a.creator=#{creator},
+        </if>
+        a.update_time = now()
+        where
+        <if test="''!=id and null!=id">
+            a.id=#{id}
+        </if>
+
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        update invest_quiz_question_choice set is_delete='Y',update_time=now() where id = #{id}
+    </delete>
+
+
+    <!-- 查询 -->
+    <select id="queryquiz_questionList" parameterType="map" resultType="dto">
+        SELECT
+        a.id,a.ShortDes
+        FROM
+        invest_quiz_question a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        <if test="''!=quizID and null!=quizID">
+            and a.quizID=#{quizID}
+        </if>
+
+        order by a.QuestionSortNum asc
+        ,a.id asc
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time desc
+        </if>
+
+        <if test="null!=end">
+            limit ${start},${end}
+        </if>
+    </select>
+</mapper>

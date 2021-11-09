@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="sysConfig">
+
+    <sql id="sql_where">
+        <if test="''!=dicName and null!=dicName">
+            and a.dicName like CONCAT('%', #{dicName}, '%')
+        </if>
+        <if test="''!=remark and null!=remark">
+            and a.remark = #{remark}
+        </if>
+        <if test="''!=val and null!=val">
+            and a.val LIKE CONCAT('%', #{val}, '%')
+        </if>
+
+        <if test="''!=type and null!=type">
+            and a.type = #{type}
+        </if>
+        <if test="''!=queryname and null!=queryname">
+            and (a.val LIKE CONCAT('%', #{queryname}, '%') or
+            a.remark LIKE CONCAT('%', #{queryname}, '%'))
+        </if>
+        <if test="''!=id and null!=id">
+            and a.id = #{id}
+        </if>
+        <if test="''!=pid and null!=pid">
+            and a.pid = #{pid}
+        </if>
+    </sql>
+
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*,u1.username AS creatorName,u2.username AS updatorName
+        FROM sys_config a
+        LEFT JOIN sys_user u1 ON a.creator = u1.id
+        LEFT JOIN sys_user u2 ON a.updator = u2.id
+        WHERE 1=1 AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+        <if test="''!=creatorName and null!=creatorName">
+            and u1.username LIKE CONCAT('%', #{creatorName}, '%')
+        </if>
+        ORDER BY a.id DESC
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="searchHomeData" parameterType="map" resultType="dto">
+        SELECT
+        IFNULL(
+        (
+        SELECT
+        COUNT(id) AS shop_num
+        FROM
+        m_shop
+        WHERE
+        to_days(update_time) >= to_days(now())
+        AND is_delete = 'N'
+        AND `status` = 1
+        ),
+        0
+        ) AS shop_num,
+        IFNULL(
+        (
+        SELECT
+        COUNT(id) AS product_num
+        FROM
+        m_product
+        WHERE
+        to_days(update_time) >= to_days(now())
+        AND is_delete = 'N'
+        AND `status` = 1
+        ),
+        0
+        ) AS product_num,
+        IFNULL(
+        (
+        SELECT
+        IFNULL(val, 0) AS jiaoyi_money
+        FROM
+        sys_config
+        WHERE
+        dicName = "jiaoyi_money"
+        ),
+        0
+        ) AS jiaoyi_money,
+        IFNULL(
+        (
+        SELECT
+        IFNULL(val, 0) AS every_num
+        FROM
+        sys_config
+        WHERE
+        dicName = "every_num"
+        ),
+        0
+        ) AS every_num
+    </select>
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        insert into sys_config
+        (dicName, val, type, remark,
+        create_time,creator,update_time,updator,is_delete)
+        values (#{dicName}, #{val},
+        #{type}, #{remark},now(),#{creator},now(),#{updator},'N')
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        DELETE FROM sys_config WHERE id = #{id}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update
+        sys_config a
+        set
+        <if test="dicName">
+            a.dicName = #{dicName},
+        </if>
+        <if test="keyNote">
+            a.keyNote = #{keyNote},
+        </if>
+        a.val = #{val},
+        <if test="type">
+            a.type = #{type},
+        </if>
+        <if test="remark">
+            a.remark = #{remark},
+        </if>
+        a.update_time=now()
+        where id = #{id}
+    </update>
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT
+        a.*,u1.username AS creatorName,u2.username AS updatorName
+        FROM sys_config a
+        LEFT JOIN sys_user u1 ON a.creator = u1.id
+        LEFT JOIN sys_user u2 ON a.updator = u2.id
+        WHERE 1=1 AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+        <if test="''!=creatorName and null!=creatorName">
+            and u1.username LIKE CONCAT('%', #{creatorName}, '%')
+        </if>
+        limit 0,1
+    </select>
+
+
+    <select id="queryConfigList" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM sys_config a
+        WHERE a.is_delete = 'N'
+    </select>
+
+    <!-- 查询 -->
+    <select id="queryDistinctList" parameterType="map" resultType="dto">
+        SELECT DISTINCT (a.remark)
+        FROM sys_config a
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT count(1) as total
+        FROM sys_config a
+        LEFT JOIN sys_user u1 ON a.creator = u1.id
+        LEFT JOIN sys_user u2 ON a.updator = u2.id
+        WHERE 1=1 AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+        <if test="''!=creatorName and null!=creatorName">
+            u1.username LIKE CONCAT('%', #{creatorName}, '%')
+        </if>
+        ORDER BY a.id DESC
+    </select>
+
+    <!--初始化类型查询   key is exclude key need add ''-->
+    <select id="queryInitList" parameterType="map" resultType="dto">
+        SELECT id,dicName,val,remark
+        FROM sys_config
+        WHERE is_delete = 'N'
+        and type = #{type}
+    </select>
+
+    <!--初始化类型查询 -->
+    <select id="queryAppVersions" resultType="dto">
+        SELECT val from sys_config where type = 'app_version' order by id
+    </select>
+
+
+    <select id="queryMemberTypeList" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM sys_config a
+        WHERE a.is_delete = 'N'
+        and a.type = "member_type"
+    </select>
+</mapper>

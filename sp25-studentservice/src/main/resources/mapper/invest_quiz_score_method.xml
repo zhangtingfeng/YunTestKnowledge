@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_quiz_score_method">
+
+    <sql id="sql_where">
+        <if test="''!=quizID and null!=quizID">
+            and a.quizID=#{quizID}
+        </if>
+        <if test="''!=Sort and null!=Sort">
+            and a.Sort=#{Sort}
+        </if>
+
+
+        <if test="''!=content and null!=content">
+            and a.content like CONCAT('%', #{content}, '%')
+        </if>
+        <if test="''!=ShortDes and null!=ShortDes">
+            and a.ShortDes like CONCAT('%', #{ShortDes}, '%')
+        </if>
+
+
+        <if test="''!=id and null!=id">
+            and a.id=#{id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_score_method a
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+        <include refid="sql_where"/>
+
+        order by a.Sort asc, a.id asc
+
+        <if test="''!=create_time and null!=create_time">
+            ,a.create_time asc
+        </if>
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+
+        SELECT count(1) as total
+        FROM
+        invest_quiz_score_method a
+
+        WHERE
+        1 = 1
+        AND a.is_delete = 'N'
+
+        <include refid="sql_where"/>
+    </select>
+
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_quiz_score_method a
+        WHERE a.is_delete = 'N'
+        <include refid="sql_where"/>
+        LIMIT 1
+    </select>
+
+    <!-- 插入 -->
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_quiz_score_method
+        (
+        <if test="quizID!=null and ''!=quizID">
+            quizID,
+        </if>
+        <if test="Sort!=null and ''!=Sort">
+            Sort,
+        </if>
+        <if test="ShortDes!=null and ''!=ShortDes">
+            ShortDes,
+        </if>
+        <if test="content!=null and ''!=content">
+            content,
+        </if>
+        <if test="lowScore!=null and ''!=lowScore">
+            lowScore,
+        </if>
+        <if test="hightScore!=null and ''!=hightScore">
+            hightScore,
+        </if>
+
+        <if test="Status!=null and ''!=Status">
+            Status,
+        </if>
+
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="quizID!=null and ''!=quizID">
+            #{quizID},
+        </if>
+        <if test="Sort!=null and ''!=Sort">
+            #{Sort},
+        </if>
+        <if test="ShortDes!=null and ''!=ShortDes">
+            #{ShortDes},
+        </if>
+        <if test="content!=null and ''!=content">
+            #{content},
+        </if>
+        <if test="lowScore!=null and ''!=lowScore">
+            #{lowScore},
+        </if>
+        <if test="hightScore!=null and ''!=hightScore">
+            #{hightScore},
+        </if>
+
+        <if test="Status!=null and ''!=Status">
+            #{Status},
+        </if>
+
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_quiz_score_method a
+        set
+        <if test="''!=quizID and null!=quizID">
+            a.quizID=#{quizID},
+        </if>
+        <if test="''!=Sort and null!=Sort">
+            a.Sort=#{Sort},
+        </if>
+        <if test="''!=ShortDes and null!=ShortDes">
+            a.ShortDes=#{ShortDes},
+        </if>
+        <if test="''!=content and null!=content">
+            a.content=#{content},
+        </if>
+
+        <if test="''!=lowScore and null!=lowScore">
+            a.lowScore=#{lowScore},
+        </if>
+        <if test="''!=hightScore and null!=hightScore">
+            a.hightScore=#{hightScore},
+        </if>
+        <if test="''!=Status and null!=Status">
+            a.Status=#{Status},
+        </if>
+
+        <if test="''!=creator and null!=creator">
+            a.creator=#{creator},
+        </if>
+        a.update_time = now()
+        where
+        <if test="''!=id and null!=id">
+            a.id=#{id}
+        </if>
+
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        update invest_quiz_score_method set is_delete='Y',update_time=now() where id = #{id}
+    </delete>
+    <!-- 审核 -->
+    <update id="updateOnlineStatus" parameterType="dto">
+        update invest_quiz_score_method set Status = #{Status} where id = #{id}
+    </update>
+
+
+</mapper>

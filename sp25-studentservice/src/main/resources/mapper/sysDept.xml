@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="sysDept">
+
+    <sql id="sql_where">
+        <if test="''!=dept_name and null!=dept_name">
+            and a.dept_name = #{dept_name}
+        </if>
+        <if test="''!=status and null!=status">
+            and a.status = #{status}
+        </if>
+        <if test="''!=status and null!=status">
+            and a.status = #{status}
+        </if>
+        <if test="''!=check_previlege and null!=check_previlege">
+            and a.check_previlege = #{check_previlege}
+        </if>
+        <if test="''!=id and null!=id">
+            and a.id = #{id}
+        </if>
+        <if test="''!=shopId and null!=shopId">
+            and a.shop_id = #{shopId}
+
+        </if>
+
+        <if test="''!=shopid and null!=shop_id">
+            and a.shop_id = #{shop_id}
+        </if>
+        <if test="''!=pid and null!=pid">
+            and a.pid = #{pid}
+        </if>
+
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.id,
+        a.dept_name AS text,
+        a.pid
+        FROM
+        sys_dept a
+        WHERE a.is_delete ='N'
+        <include refid="sql_where"/>
+        ORDER BY id
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        insert into sys_dept (dept_name,
+        <if test="''!=pid and null!=pid">
+            pid,
+        </if>
+        sort, remark, shop_id,
+        status,create_time,creator,update_time,updator,is_delete)
+        values (#{dept_name},
+        <if test="''!=pid and null!=pid">
+            pid = #{pid},
+        </if>
+        #{sort}, #{remark}, #{shopId},
+        #{status},now(),#{creator},now(),#{updator},'N')
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        UPDATE sys_dept set is_delete = 'Y' WHERE id = #id#
+    </delete>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update sys_dept
+        set
+        <if test="''!=dept_name and null!=dept_name">
+            a.dept_name = #{dept_name}
+        </if>
+        <if test="''!=dept_name and null!=dept_name">
+            a.dept_name = #{dept_name}
+        </if>
+        <if test="''!=dept_name and null!=1">
+            pid = #{pid},
+        </if>
+        update_time = now(),
+        updator = #{updator}
+        where id = #{id}
+    </update>
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM sys_dept a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        limit 0,1
+    </select>
+
+    <!-- 查询 -->
+    <select id="judgeDept" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM sys_dept a
+        WHERE a.pid = #{id} and a.is_delete = 'N' or a.id in (select deptid from sys_user where `status`='1' and deptid
+        = #{id})
+        limit 1
+    </select>
+</mapper>

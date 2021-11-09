@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="shopNorm">
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        insert into m_product_specs (name, code,type_id, sortno,create_time,creator,update_time,is_delete,status)
+        values (#{name}, #{code},#{type_id},#{sortno},now(),#{creator},now(),'N',#{status})
+    </insert>
+
+    <!-- 插入 -->
+    <insert id="saveSpecsInfo" parameterType="dto">
+        insert into m_product_specs(product_id,name, code,sortno,create_time,creator,update_time,is_delete)
+        values (#{product_id},#{spaecsname},#{spaecscode},#{sortnos},now(),#{creator},now(),'N')
+    </insert>
+    <!-- 修改 -->
+    <update id="updateSpecsInfo" parameterType="dto">
+        update m_product_specs a
+        set
+        <if test="spaecsname">
+            a.name = #{spaecsname},
+        </if>
+        <if test="sortnos">
+            a.sortno = #{sortnos},
+        </if>
+        <if test="spaecscode">
+            a.code = #{spaecscode},
+        </if>
+        <if test="updator">
+            a.updator = #{updator},
+        </if>
+        update_time = now()
+        where id = #{id2}
+    </update>
+
+
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*,p.`text` as typename,c.name as product_name
+        FROM
+        m_product_specs AS a
+        LEFT JOIN m_product_type p on p.id=a.type_id
+        LEFT JOIN m_product c on c.id=a.product_id
+        where 1=1 and a.is_delete='N'
+        <if test="null!=type_id">
+            and a.type_id=#{type_id}
+        </if>
+
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(1) as total
+        FROM
+        m_product_specs AS a
+        where 1=1 and a.is_delete='N'
+
+    </select>
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM m_product_specs a
+        WHERE 1=1 and a.is_delete = 'N' and a.id=#{id}
+        limit 0,1
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update m_product_specs a
+        set
+        <if test="name">
+            a.name = #{name},
+        </if>
+        <if test="sortno">
+            a.sortno = #{sortno},
+        </if>
+        <if test="code">
+            a.code = #{code},
+        </if>
+        <if test="updator">
+            a.updator = #{updator},
+        </if>
+        update_time = now()
+        where id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        UPDATE m_product_specs set is_delete = 'Y' WHERE id = #{id}
+    </delete>
+
+
+    <!-- 删除 -->
+    <delete id="deleteSlideshows" parameterType="map">
+        UPDATE m_product_specs set is_delete = 'Y' WHERE id = #{id}
+    </delete>
+
+
+    <select id="querySpecsList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+
+        FROM
+        m_product_specs AS a
+        where 1=1 and a.is_delete='N'
+        <if test="null!=product_id">
+            and a.product_id=#{product_id}
+        </if>
+
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <select id="querySpecsListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(1) as total
+        FROM
+        m_product_specs AS a
+        where 1=1 and a.is_delete='N'
+        <if test="null!=product_id">
+            and a.product_id=#{product_id}
+        </if>
+
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="getSpacesInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM m_product_specs a
+        WHERE 1=1 and a.is_delete = 'N' and
+        a.id=#{id}
+        limit 0,1
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveSpecsShopInfo" parameterType="dto">
+        insert into m_product_specs_shop (specs_id,name, code,shop_id,sortno,create_time,creator,update_time,is_delete)
+        values (#{specs_id},#{name3},#{code3},#{shop_id},#{sortno3},now(),#{creator},now(),'N')
+    </insert>
+
+
+    <select id="querySpecsShopList" parameterType="map" resultType="dto">
+        SELECT
+        a.*, b.`name` as specs_name,b.id as bid,
+        c. name as shop_name
+        FROM
+        m_product_specs_shop AS a
+        LEFT JOIN m_product_specs AS b ON (a.specs_id = b.id)
+        LEFT JOIN m_shop AS c ON (a.shop_id = c.id)
+        where 1=1 and a.is_delete='N'
+        <if test="null!=specs_id">
+            and a.specs_id=#{specs_id}
+        </if>
+        <if test="null!=shop_id">
+            and a.shop_id=#{shop_id}
+        </if>
+
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+    <select id="querySpecsShopListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(1) as total
+        FROM
+        m_product_specs_shop AS a
+        WHERE 1=1 and a.is_delete='N'
+        <if test="null!=specs_id">
+            and a.specs_id=#{specs_id}
+        </if>
+        <if test="null!=shop_id">
+            and a.shop_id=#{shop_id}
+        </if>
+
+    </select>
+
+    <select id="getSpacesShopInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM m_product_specs_shop a
+        WHERE 1=1 and a.is_delete = 'N' and a.id=#{id}
+        limit 0,1
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateSpecsShopInfo" parameterType="dto">
+        update m_product_specs_shop a
+        set
+        <if test="name3">
+            a.name = #{name3},
+        </if>
+        <if test="sortno3">
+            a.sortno = #{sortno3},
+        </if>
+        <if test="code3">
+            a.code = #{code3},
+        </if>
+        <if test="updator">
+            a.updator = #{updator},
+        </if>
+        update_time = now()
+        where id = #{id3}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteSlideshow3" parameterType="map">
+        UPDATE m_product_specs_shop set is_delete = 'Y' WHERE id = #{ids}
+    </delete>
+</mapper>

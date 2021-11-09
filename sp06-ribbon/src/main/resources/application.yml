@@ -1,0 +1,44 @@
+spring:
+  cloud:
+    inetutils:
+      ignored-interfaces[0]: eth0
+  sleuth:
+    sampler:
+      probability: 1.0   #2.0后percentage改为probability
+  zipkin:
+    base-url: http://localhost:9411
+
+  application:
+    name: ribbon
+  redis:
+    ip: 127.0.0.1
+    host: 127.0.0.1
+    port: 6379                  #password: fa$17p%w0%nsQJz2    自助重启平台：http://www.gotonets.com/gotonets/    您的用户名为：900161526    初始密码为：121212
+      #password: rootQAZ /etc/redis  219.235.6.205 logfile /var/log/redis/redis-server.log  日志地址
+    password: foo123456bared
+    database: 0
+    pool:
+      max-active: 500  #最大连接数：能够同时建立的“最大链接个数”
+      max-idle: 200 #最大空闲数：空闲链接数大于maxIdle时，将进行回收
+      min-idle: 20 #最小空闲数：低于minIdle时，将创建新的链接
+      max-wait: -1 # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认 -1
+
+      ####Ubuntu关机重启命令简介: 重启命令:
+      #1.reboot
+      #2.shutdown -r now 立刻重启(root用户使用)
+      #3.shutdown -r 10 过10分钟自动重启(root用户使用)
+      #4.shutdown -r 20:35 在时间为20:35时候重启(root用户使用)
+    timeout: 50000
+
+
+server:
+  port: 48001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:48011/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+

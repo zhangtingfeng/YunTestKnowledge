@@ -1,0 +1,12 @@
+# application-eureka2.yml
+#  那下面如果要应用某一个profile的话，需要这样设置，在启动eureka服务时，加一个启动参数去激活某一个profile，即 java -jar eureka.jar --spring.profiles.active=eureka1，如果想激活eureka1，就在后面写eureka1；想激活eureka2，就在后面写eureka2；那另外这两个eureka也要在不同的端口上启动，那还要再加一个参数，指定端口号，我们这里eureka1用2001端口，eureka2用2002端口：即启动eureka1时：java -jar eureka.jar --spring.profiles.active=eureka1 --server.port=2001；启动eureka2时：java -jar eureka.jar --spring.profiles.active=eureka2 --server.port=2002；
+eureka:
+  instance:
+    # 主机名，集群内部区分不同服务器
+    hostname: eureka2
+  client:
+    # 单台服务器，不注册不拉取
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://219.235.6.205:48011/eureka

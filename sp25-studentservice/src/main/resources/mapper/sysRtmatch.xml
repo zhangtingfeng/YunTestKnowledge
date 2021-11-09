@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="sysRtmatch">
+
+    <sql id="sql_where">
+        <if test="''!=demandname and null!=demandname">
+            and a.req_type = #{demandname}
+        </if>
+        <if test="''!=resourcename and null!=resourcename">
+            and a.pub_type = #{resourcename}
+        </if>
+        <if test="''!=id and null!=id">
+            and a.id = #{id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        select *
+        from
+        (SELECT
+        id,member_id,number,company,username,mobile , ("投融资需求") as demandname from t_pub_finance a
+        union all SELECT
+        id,member_id,number,company,username,mobile , ("产品需求") as demandname from t_pub_product b
+        union all SELECT
+        id,member_id,number,company,username,mobile, ("项目需求") as demandname from t_pub_project c
+        union all SELECT
+        id,member_id,number,company,username,mobile, ("技术需求") as demandname from t_pub_tech d) as o
+        <include refid="sql_where"/>
+        ORDER BY id
+    </select>
+
+    <!-- 查询 -->
+    <select id="queryListTest" parameterType="map" resultType="dto">
+        select *
+        from
+        (SELECT
+        id,member_id,status,username,mobile,("渠道资源") as resourcename from t_req_channel a
+        union all SELECT
+        id,member_id,status,username,mobile,("生产资源") as resourcename from t_req_produce b
+        union all SELECT
+        id,member_id,status,username,mobile,("技术资源") as resourcename from t_req_tech c
+        ) as o
+        <include refid="sql_where"/>
+        ORDER BY id
+    </select>
+
+    <select id="queryListTestCount" parameterType="map" resultType="java.lang.Integer">
+        SELECT sum(tmpcount)
+        from
+        (SELECT
+        count(a.id) as tmpcount from t_req_channel a
+        union all SELECT
+        count(b.id) as tmpcount from t_req_produce b
+        union all SELECT
+        count(c.id) as tmpcount from t_req_tech c
+        ) as o
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="java.lang.Integer">
+        SELECT sum(tmpcount)
+        from
+        (SELECT
+        count(a.id) as tmpcount from t_pub_finance a
+        union all SELECT
+        count(b.id) as tmpcount from t_pub_product b
+        union all SELECT
+        count(c.id) as tmpcount from t_pub_project c
+        union all SELECT
+        count(d.id) as tmpcount from t_pub_tech d
+        ) as o
+    </select>
+
+
+    <!-- 撮合匹配-->
+    <insert id="saveInfo" parameterType="dto">
+        insert into t_req_pub (user_id, req_id,
+        req_type,pub_id,pub_type,create_time,
+        update_time, is_delete
+        )
+        values (1,#{req_id},#{req_type},#{pub_id},#{pub_type},now(),
+        now(), 'N'
+        )
+    </insert>
+
+</mapper>

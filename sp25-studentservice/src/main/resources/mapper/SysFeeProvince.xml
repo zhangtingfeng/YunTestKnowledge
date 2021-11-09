@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="SysFeeProvince">
+
+    <sql id="sql_where">
+        <if test="''!=province_id and null!=province_id">
+            and a.province_id = #{province_id}
+        </if>
+    </sql>
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM sys_fee_province a
+        where 1=1
+        <include refid="sql_where"/>
+        ORDER BY id
+    </select>
+
+
+</mapper>

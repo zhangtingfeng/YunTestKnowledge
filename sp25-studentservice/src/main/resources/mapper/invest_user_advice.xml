@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_user_advice">
+
+
+    <!-- 插入 -->
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_user_advice
+        (
+        <if test="userid!=null and ''!=userid">
+            userid,
+        </if>
+        <if test="quizMemo!=null and ''!=quizMemo">
+            quizMemo,
+        </if>
+        <if test="filelist!=null and ''!=filelist">
+            filelist,
+        </if>
+        <if test="piclist!=null and ''!=piclist">
+            piclist,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="userid!=null and ''!=userid">
+            #{userid},
+        </if>
+        <if test="quizMemo!=null and ''!=quizMemo">
+            #{quizMemo},
+        </if>
+        <if test="filelist!=null and ''!=filelist">
+            #{filelist},
+        </if>
+        <if test="piclist!=null and ''!=piclist">
+            #{piclist},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+    </insert>
+
+
+</mapper>

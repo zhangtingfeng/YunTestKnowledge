@@ -1,0 +1,41 @@
+# ??????
+#ddd  java -jar sp21-toolsservice-0.0.1-SNAPSHOT.jar --spring.config.location=application.yml
+#???????????
+spring:
+  application:
+    name: tools-service
+  thymeleaf:
+    cache: false # ���� thymeleaf ����
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  datasource:
+    url: jdbc:mysql://rm-uf655z4n9sg2kmrz93o.mysql.rds.aliyuncs.com:3306/edufileuplaoad21
+    username: edufileuplaoad21
+    password: Foodztf1000257
+    driver-class-name: com.mysql.jdbc.Driver
+  sleuth:
+    sampler:
+      probability: 1.0   #2.0后percentage改为probability
+  zipkin:
+    base-url: http://localhost:9411
+
+server:
+  port: 48020
+  servlet:
+    context-path: /${spring.application.name}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:48011/eureka
+      fetch-registry: true
+      register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+myupload:
+  serverIMGUpload: C:\\tmp
+  img_url: StaticImg/edu

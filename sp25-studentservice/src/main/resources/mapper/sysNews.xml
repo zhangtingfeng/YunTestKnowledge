@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="sysNews">
+
+    <sql id="sql_where">
+        <if test="''!=title and null!=title">
+            and a.title like CONCAT('%', #{title}, '%')
+        </if>
+        <if test="''!=id and null!=id">
+            and a.id=#{id}
+        </if>
+        <if test="''!=whether_push and null!=whether_push">
+            and a.whether_push=#{whether_push}
+        </if>
+
+        <if test="''!=startTime and null!=startTime">
+            and a.create_time &gt;= #{startTime}
+        </if>
+        <if test="''!=endTime and null!=endTime">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+
+    </sql>
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT a.* FROM sys_news a WHERE 1=1 and a.is_delete='N'
+        <include refid="sql_where"/>
+
+
+        order by a.create_time desc
+        <if test="null!=start">
+            limit ${start},${end}
+        </if>
+    </select>
+
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT count(1) as total
+        FROM
+        sys_news a WHERE 1=1 and a.is_delete='N'
+        <include refid="sql_where"/>
+    </select>
+
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.* FROM sys_news a WHERE a.id=#{id} and a.is_delete='N'
+
+
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO sys_news
+        (
+        <if test="title!=null and ''!=title">
+            title,
+        </if>
+        <if test="content!=null and ''!=content">
+            content,
+        </if>
+        <if test="whether_push!=null and ''!=whether_push">
+            whether_push,
+        </if>
+
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="title!=null and ''!=title">
+            #{title},
+        </if>
+        <if test="content!=null and ''!=content">
+            #{content},
+        </if>
+        <if test="whether_push!=null and ''!=whether_push">
+            #{whether_push},
+        </if>
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        now(),
+
+        'N')
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update sys_news a
+        set
+        <if test="''!=title and null!=title">
+            a.title=#{title},
+        </if>
+        <if test="''!=content and null!=content">
+            a.content=#{content},
+        </if>
+        <if test="''!=whether_push and null!=whether_push">
+            a.whether_push=#{whether_push},
+        </if>
+
+        a.update_time = now(),
+        a.updator = #{updator}
+        where id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        update sys_news set is_delete = 'Y' where id = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 参数管理手工映射SQL语句 -->
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_quiz_user">
+
+
+    <sql id="sql_where">
+        <if test="null!=investUserID  and ''!= investUserID">
+            and a.investUserID = #{investUserID}
+        </if>
+        <if test="null!=finished  and ''!= finished">
+            and a.finished = #{finished}
+        </if>
+        <if test="null!=score  and ''!= score">
+            and a.score = #{score}
+        </if>
+        <if test="null!=quizID  and ''!= quizID">
+            and a.quizID = #{quizID}
+        </if>
+        <if test="null!=groupID  and ''!= groupID">
+            and a.groupID = #{groupID}
+        </if>
+        <if test="null==groupID  or ''== groupID">
+            and ISNULL(a.groupID) = 1
+        </if>
+        <if test="null!=id  and ''!= id">
+            and a.id = #{id}
+        </if>
+    </sql>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        UPDATE invest_quiz_user set is_delete = 'Y' WHERE id = #{id}
+    </delete>
+
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM invest_quiz_user a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        limit 0,1
+    </select>
+
+
+    <select id="queryAutoUser" resultType="dto">
+        SELECT a.* from invest_quiz_user a
+        WHERE a.is_delete = 'N'
+        order by a.id desc
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        c.wx_NickName,a.*,b.Title as Title
+        FROM
+        invest_quiz_user a
+        left join invest_quiz b on b.id=a.quizID
+        left join invest_user c on c.id=a.investUserID
+
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        ORDER BY a.id asc
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(a.id) as total
+        FROM invest_quiz_user a
+        WHERE 1=1 and a.is_delete = 'N'
+
+        <include refid="sql_where"/>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        INSERT INTO invest_quiz_user
+        (
+        <if test="investUserID!=null and ''!=investUserID">
+            investUserID,
+        </if>
+        <if test="finished!=null and ''!=finished">
+            finished,
+        </if>
+        <if test="score!=null and ''!=score">
+            score,
+        </if>
+        <if test="scoreDes!=null and ''!=scoreDes">
+            scoreDes,
+        </if>
+        <if test="quizID!=null and ''!=quizID">
+            quizID,
+        </if>
+        <if test="groupID!=null and ''!=groupID">
+            groupID,
+        </if>
+
+        beginTime,
+        <if test="endTime!=null and ''!=endTime">
+            endTime,
+        </if>
+
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="investUserID!=null and ''!=investUserID">
+            #{investUserID},
+        </if>
+        <if test="finished!=null and ''!=finished">
+            #{finished},
+        </if>
+        <if test="score!=null and ''!=score">
+            #{score},
+        </if>
+        <if test="scoreDes!=null and ''!=scoreDes">
+            #{scoreDes},
+        </if>
+        <if test="quizID!=null and ''!=quizID">
+            #{quizID},
+        </if>
+        <if test="groupID!=null and ''!=groupID">
+            #{groupID},
+        </if>
+
+        now(),
+        <if test="endTime!=null and ''!=endTime">
+            #{endTime},
+        </if>
+
+
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+
+        now(),
+        'N')
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() as id
+        </selectKey>
+
+
+    </insert>
+
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_quiz_user
+        set
+        <if test="null!=investUserID  and ''!= investUserID">
+            investUserID = #{investUserID},
+        </if>
+        <if test="null!=finished  and ''!= finished">
+            finished = #{finished},
+        </if>
+        <if test="null!=score  and ''!= score">
+            score = #{score},
+        </if>
+        <if test="null!=scoreDes  and ''!= scoreDes">
+            scoreDes = #{scoreDes},
+        </if>
+        <if test="null!=quizID  and ''!= quizID">
+            quizID = #{quizID},
+        </if>
+        <if test="null!=groupID  and ''!= groupID">
+            groupID = #{groupID},
+        </if>
+
+        <if test="null!=beginTime  and ''!= beginTime">
+            beginTime = #{beginTime},
+        </if>
+        <if test="null!=endTime  and ''!= endTime">
+            endTime = #{endTime},
+        </if>
+
+
+        <if test="null!=creator  and ''!= creator">
+            creator = #{creator},
+        </if>
+
+
+        update_time = now(),
+        updator = #{updator}
+        where id = #{id}
+    </update>
+
+
+</mapper>

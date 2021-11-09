@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 参数管理手工映射SQL语句 -->
+
+
+<mapper namespace="invest_quiz_search">
+
+    <!--22  MBTI -->
+    <select id="Count_ID_22____" parameterType="map" resultType="dto">
+
+select q.bClassID as title,q.bClassIDCount as ClassScore,w.maxclassID as ClassCount  from (
+select bClassID,count(bClassID) as bClassIDCount from
+(
+select c.ClassID as cClassID,b.ClassID as bClassID,a.* from invest_quiz_user_answer a
+left join invest_quiz_question_choice b
+on a.answer=b.id
+left join invest_quiz_question c
+on a.invest_quiz_questionID=c.id
+ where a.invest_quiz_userID=#{keyuserID}
+) d
+group by bClassID
+order by bClassIDCount desc)q
+left join (
+select classID,count(classID) as maxclassID from(
+select * from invest_quiz_question_choice where quiz_questionID in (
+select e.id from invest_quiz_question e where e.quizID=22 )) d group by classID
+)w
+on w.classID=q.bClassID
+
+    </select>
+
+
+    <select id="Count_ID_3435363738____ErrorInfo" parameterType="map" resultType="dto">
+
+        SELECT e.ClassID,e.ShortDes,f.title from(
+        SELECT d.quiz_questionID,c.* from (
+        select b.quiz_questionID from invest_quiz_user_answer a
+        left join invest_quiz_question_choice b
+        on a.answer=b.id
+        WHERE a.invest_quiz_userID=#{id} and ifnull(b.correctAnswerScore,0)<![CDATA[<]]>1) d
+        left join invest_quiz_question c
+        on d.quiz_questionID=c.id)e
+        left JOIN invest_quiz_class f
+        on f.id=e.ClassID
+
+
+    </select>
+
+
+    <select id="Count_ID_3435363738____" parameterType="map" resultType="dto">
+
+        SELECT e.* ,f.* from
+        (SELECT ClassID,count(1) as maxScore,sum(correctAnswerScore) as answerScore from (
+        SELECT a.invest_quiz_questionID,b.ClassID,c.correctAnswerScore from invest_quiz_user_answer a
+        left join invest_quiz_question b
+        on a.invest_quiz_questionID=b.id
+        left join invest_quiz_question_choice c
+        on a.answer=c.id
+
+        where a.invest_quiz_userID=#{id}
+        ) d group by ClassID
+        ) e
+        left join invest_quiz_class f
+        on e.ClassID =f.id
+        order by answerScore desc
+
+
+    </select>
+
+    <!--8  智力类型 -->
+    <select id="Count_ID_8____" parameterType="map" resultType="dto">
+
+        SELECT e.ClassScore as tScore ,f.title from
+        (SELECT ClassID,count(1) as ClassCount,sum(correctAnswerScore) as ClassScore from (
+        SELECT a.invest_quiz_questionID,b.ClassID,c.correctAnswerScore from invest_quiz_user_answer a
+        left join invest_quiz_question b
+        on a.invest_quiz_questionID=b.id
+        left join invest_quiz_question_choice c
+        on a.answer=c.id
+
+        where a.invest_quiz_userID=#{keyuserID}
+        ) d group by ClassID
+        ) e
+        left join invest_quiz_class f
+        on e.ClassID =f.id
+        order by ClassScore desc
+    </select>
+
+    <!--16  威廉斯创造力测试题 -->
+    <select id="Count_ID_16____" parameterType="map" resultType="dto">
+
+        SELECT e.* ,f.title from
+        (SELECT ClassID,count(1)*3 as ClassCount,sum(correctAnswerScore) as ClassScore from (
+        SELECT a.invest_quiz_questionID,b.ClassID,c.correctAnswerScore from invest_quiz_user_answer a
+        left join invest_quiz_question b
+        on a.invest_quiz_questionID=b.id
+        left join invest_quiz_question_choice c
+        on a.answer=c.id
+
+        where a.invest_quiz_userID=#{keyuserID}
+        ) d group by ClassID
+        ) e
+        left join invest_quiz_class f
+        on e.ClassID =f.id
+        order by ClassScore desc
+    </select>
+
+
+    <!--17  霍兰德职业兴趣测试题 -->
+    <select id="Count_ID_17____" parameterType="map" resultType="dto">
+
+        SELECT e.* ,f.title from
+        (SELECT ClassID,count(1) as ClassCount,sum(correctAnswerScore) as ClassScore from (
+        SELECT a.invest_quiz_questionID,b.ClassID,c.correctAnswerScore from invest_quiz_user_answer a
+        left join invest_quiz_question b
+        on a.invest_quiz_questionID=b.id
+        left join invest_quiz_question_choice c
+        on a.answer=c.id
+
+        where a.invest_quiz_userID=#{keyuserID}
+        ) d group by ClassID
+        ) e
+        left join invest_quiz_class f
+        on e.ClassID =f.id
+        order by ClassScore desc
+    </select>
+
+    <!--28 团队 合作 -->
+    <select id="Count_ID_28__total___" parameterType="map" resultType="dto">
+        select count(b.AnswerSortNum) as total from invest_quiz_user_answer a
+        left join invest_quiz_question_choice b
+        on a.answer=b.id
+        where invest_quiz_userID=#{id} and b.AnswerSortNum=#{abc123}
+    </select>
+
+    <!--三维人格 三维的第一个图   -->
+    <select id="Count_ID_10_3_____" parameterType="map" resultType="dto">
+        select g.ShortDes as title ,sum(g.answerScore) as answerScore ,sum(g.maxscore) as maxscore from
+        (select f.*,e.* from invest_quiz_class f
+        left join
+        (select classid,sum(correctAnswerScore) as answerScore,count(correctAnswerScore) as maxscore from
+        (SELECT c.classID,a.id,b.correctAnswerScore FROM invest_quiz_user_answer a
+        left join invest_quiz_question_choice b
+        on a.answer=b.id
+
+
+        left join invest_quiz_question c
+        on a.invest_quiz_questionID=c.id
+
+        where a.invest_quiz_userID=#{id})d
+        group by classid) e
+        on f.id=e.classid where f.quizid=10)g group by g.ShortDes
+
+    </select>
+
+
+    <!--三维人格 三维的第二个雷达图   -->
+    <select id="Count_ID_10_3_12____" parameterType="map" resultType="dto">
+        select f.*,e.* from invest_quiz_class f
+        left join
+        (select classid,sum(correctAnswerScore) as answerScore,count(correctAnswerScore) as maxscore from
+        (SELECT c.classID,a.id,b.correctAnswerScore FROM invest_quiz_user_answer a
+        left join invest_quiz_question_choice b
+        on a.answer=b.id
+
+
+        left join invest_quiz_question c
+        on a.invest_quiz_questionID=c.id
+
+        where a.invest_quiz_userID=#{id})d
+        group by classid) e
+        on f.id=e.classid where f.quizid=10
+
+    </select>
+
+    <select id="Count_ID_4_____" parameterType="map" resultType="dto">
+        SELECT f.*,c.* FROM invest_quiz_class f left join
+
+        (select count(correctAnswerScore) as ClassCount,sum(correctAnswerScore) as ClassScore,ClassID from (SELECT aa.*,
+        bb.quizID,
+        bb.ClassID,
+        bb.ShortDes,
+        bb.content,
+        bb.Picture,
+        bb.questiontype,
+        bb.quiz_question_Status ,
+        bb.Score,
+        bb.AnswerDec,
+        b.correctAnswerScore
+
+        FROM invest_quiz_user_answer aa
+
+        LEFT JOIN invest_quiz_question bb on
+        aa.invest_quiz_questionID=bb.id
+
+        LEFT JOIN invest_quiz_question_choice b on
+        aa.answer=b.id
+
+        where aa.invest_quiz_userID=#{id}
+        and aa.answered='Y') b
+        group by ClassID)c
+
+        on f.id=c.ClassID
+
+        where f.quizID=4 order by f.QuestionSortNum asc
+
+    </select>
+
+
+    <select id="Count_ID_5__total___" parameterType="map" resultType="dto">
+
+        select sum(hh.tScore) as total
+
+        from
+        (SELECT f.*,c.* FROM invest_quiz_class f left join
+
+        (select count(correctAnswerScore) as ClassCount,sum(correctAnswerScore) as ClassScore,ClassID from (SELECT aa.*,
+        bb.quizID,
+        bb.ClassID,
+        bb.ShortDes,
+        bb.content,
+        bb.Picture,
+        bb.questiontype,
+        bb.quiz_question_Status ,
+        bb.Score,
+        bb.AnswerDec,
+        b.correctAnswerScore
+
+        FROM invest_quiz_user_answer aa
+
+        LEFT JOIN invest_quiz_question bb on
+        aa.invest_quiz_questionID=bb.id
+
+        LEFT JOIN invest_quiz_question_choice b on
+        aa.answer=b.id
+
+        where aa.invest_quiz_userID=#{id}
+        and aa.answered='Y') b
+        group by ClassID)c
+
+        on f.id=c.ClassID
+
+        where f.quizID=5 order by f.QuestionSortNum asc)h
+
+        left join invest_quiz_class_5_t_gantong hh
+
+        on hh.classID=h.id and hh.originScore=h.ClassScore
+
+    </select>
+
+    <select id="Count_ID_5_____" parameterType="map" resultType="dto">
+
+        select h.*,hh.tScore,(CASE WHEN hh.tScore &lt; 30 THEN '重度失常'
+        WHEN hh.tScore <![CDATA[>=]]> 30 AND hh.tScore &lt; 40 THEN '中度失常'
+        WHEN hh.tScore <![CDATA[>=]]> 40 AND hh.tScore &lt; 50 THEN '轻度失常'
+        ELSE '正常' END) AS REMARK
+
+
+        from
+        (SELECT f.*,c.* FROM invest_quiz_class f left join
+
+        (select count(correctAnswerScore) as ClassCount,sum(correctAnswerScore) as ClassScore,ClassID from (SELECT aa.*,
+        bb.quizID,
+        bb.ClassID,
+        bb.ShortDes,
+        bb.content,
+        bb.Picture,
+        bb.questiontype,
+        bb.quiz_question_Status ,
+        bb.Score,
+        bb.AnswerDec,
+        b.correctAnswerScore
+
+        FROM invest_quiz_user_answer aa
+
+        LEFT JOIN invest_quiz_question bb on
+        aa.invest_quiz_questionID=bb.id
+
+        LEFT JOIN invest_quiz_question_choice b on
+        aa.answer=b.id
+
+        where aa.invest_quiz_userID=#{id}
+        and aa.answered='Y') b
+        group by ClassID)c
+
+        on f.id=c.ClassID
+
+        where f.quizID=5 order by f.QuestionSortNum asc)h
+
+        left join invest_quiz_class_5_t_gantong hh
+
+        on hh.classID=h.id and hh.originScore=h.ClassScore
+
+    </select>
+
+    <select id="Count_ID_21_____" parameterType="map" resultType="dto">
+
+        SELECT IFNULL(countClassID, 0) as countClassID,title,id,quizID from (
+        SELECT w.countClassID,a.* from invest_quiz_class a LEFT JOIN (
+        SELECT ClassID,count(ClassID) as countClassID from ( SELECT c.id,c.answer,p.ClassID from invest_quiz_user_answer
+        c LEFT JOIN invest_quiz_question_choice p
+        on p.id=c.answer
+        where c.invest_quiz_userID=#{keyuserID}) q GROUP BY ClassID) w on a.id=w.ClassID and a.quizID=#{quizID})k where
+        k.quizID=#{quizID} ORDER BY countClassID desc
+
+    </select>
+
+    <!-- 恋爱性格 id=21
+    乐嘉性格色彩测试（完全版) id=25    SELECT a.* from invest_quiz_question_choice a left join invest_quiz_question b on a.quiz_questionID=b.id
+ WHERE b.quizID=25-->
+    <select id="Count_ID_32_25_____" parameterType="map" resultType="dto">
+        SELECT count(b.ClassID) as total FROM invest_quiz_user_answer a
+        LEFT JOIN invest_quiz_question_choice b on a.answer=b.id
+        where a.invest_quiz_userID=#{keyuserID} and b.ClassID=#{keywordENTJ}
+    </select>
+
+
+    <!-- 恋爱性格 id=32
+    乐嘉性格色彩测试（完全版) id=25    SELECT a.* from invest_quiz_question_choice a left join invest_quiz_question b on a.quiz_questionID=b.id
+ WHERE b.quizID=25
+    <select id="Count_ID_32_25_____" parameterType="map" resultType="dto">
+       SELECT count(b.ClassID) as total FROM invest_quiz_user_answer a
+       LEFT JOIN invest_quiz_question_choice b on a.answer=b.id
+       where a.invest_quiz_userID=#{keyuserID} and b.ClassID=#{keywordENTJ}
+    </select>
+-->
+
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+
+        SELECT e.rownum,k.* FROM invest_quiz k right join (
+        select id,(@rownum := @rownum + 1) as rownum from (SELECT distinct(a.id) FROM invest_quiz a left join
+        invest_quiz_class b on a.id=b.quizID left join invest_quiz_question bb on a.id=bb.quizID where a.Title like
+        CONCAT('%', #{keyword}, '%') or a.quizMemo like CONCAT('%', #{keyword}, '%') or a.InvestMemo like
+        CONCAT('%',#{keyword}, '%') or b.title like CONCAT('%',#{keyword}, '%') or bb.ShortDes like
+        CONCAT('%',#{keyword}, '%')
+        order by (
+        case
+        when a.Title=#{keyword} then 1
+        when a.Title like concat(#{keyword},'%') then 2
+        when a.Title like concat('%',#{keyword},'%') then 3
+        when b.title like CONCAT('%',#{keyword}, '%') then 4
+        when a.quizMemo=#{keyword} then 11
+        when a.quizMemo like concat(#{keyword},'%') then 12
+        when a.quizMemo like concat('%',#{keyword},'%') then 13
+        when a.InvestMemo=#{keyword} then 21
+        when a.InvestMemo like concat(#{keyword},'%') then 22
+        when a.InvestMemo like concat('%',#{keyword},'%') then 23
+        when bb.ShortDes like CONCAT('%',#{keyword}, '%') then 33
+        else 40
+        end
+
+        )
+        asc)d,(SELECT @rownum := 0) myTempTable) e on e.id=k.id;
+
+    </select>
+
+
+</mapper>

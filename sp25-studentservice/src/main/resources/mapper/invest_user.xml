@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 参数管理手工映射SQL语句 -->
+<!-- 参数管理手工映射SQL语句 -->
+<mapper namespace="invest_user">
+
+
+    <sql id="sql_where">
+        <if test="null!=sp_openid  and ''!= sp_openid">
+            and a.sp_openid = #{sp_openid}
+        </if>
+
+        <if test="null!=pId  and ''!= pId">
+            and a.pId = #{pId}
+        </if>
+
+        <if test="null!=id  and ''!= id">
+            and a.id = #{id}
+        </if>
+
+
+        <if test="null!=language  and ''!= language">
+            and a.language = #{language}
+        </if>
+    </sql>
+
+    <!-- 删除 -->
+    <delete id="deleteInfo" parameterType="map">
+        UPDATE invest_user set is_delete = 'Y' WHERE id = #{id}
+    </delete>
+
+
+    <!-- 查询 -->
+    <select id="getInfo" parameterType="map" resultType="dto">
+        SELECT a.*
+        FROM invest_user a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        limit 0,1
+    </select>
+
+
+    <select id="queryAutoUser" resultType="dto">
+        SELECT a.* from invest_user a
+        WHERE a.is_delete = 'N'
+        order by a.id desc
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryList" parameterType="map" resultType="dto">
+        SELECT
+        a.*
+        FROM
+        invest_user a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+        ORDER BY a.id desc
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
+
+    <!-- 查询 -->
+    <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT
+        count(a.id) as total
+        FROM invest_user a
+        WHERE 1=1 and a.is_delete = 'N'
+        <include refid="sql_where"/>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="saveInfo" parameterType="dto">
+        <selectKey resultType="long" keyProperty="id" keyColumn="id" order="AFTER">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+
+
+        INSERT INTO invest_user
+        (
+        <if test="sp_openid!=null and ''!=sp_openid">
+            sp_openid,
+        </if>
+        <if test="wx_PicURL!=null and ''!=wx_PicURL">
+            wx_PicURL,
+        </if>
+        <if test="wx_NickName!=null and ''!=wx_NickName">
+            wx_NickName,
+        </if>
+        <if test="pId!=null and ''!=pId">
+            pId,
+        </if>
+        <if test="wx_UnionID!=null and ''!=wx_UnionID">
+            wx_UnionID,
+        </if>
+        <if test="teamID!=null and ''!=teamID">
+            teamID,
+        </if>
+        <if test="sex!=null and ''!=sex">
+            sex,
+        </if>
+        <if test="country!=null and ''!=country">
+            country,
+        </if>
+        <if test="province!=null and ''!=province">
+            province,
+        </if>
+        <if test="city!=null and ''!=city">
+            city,
+        </if>
+        <if test="language!=null and ''!=language">
+            language,
+        </if>
+        <if test="creator!=null and ''!=creator">
+            creator,
+        </if>
+        <if test="updator!=null and ''!=updator">
+            updator,
+        </if>
+        create_time,
+        is_delete
+        )
+        VALUES
+        (
+        <if test="sp_openid!=null and ''!=sp_openid">
+            #{sp_openid},
+        </if>
+        <if test="wx_PicURL!=null and ''!=wx_PicURL">
+            #{wx_PicURL},
+        </if>
+        <if test="wx_NickName!=null and ''!=wx_NickName">
+            #{wx_NickName},
+        </if>
+        <if test="pId!=null and ''!=pId">
+            #{pId},
+        </if>
+        <if test="wx_UnionID!=null and ''!=wx_UnionID">
+            #{wx_UnionID},
+        </if>
+        <if test="teamID!=null and ''!=teamID">
+            #{teamID},
+        </if>
+        <if test="sex!=null and ''!=sex">
+            #{sex},
+        </if>
+        <if test="country!=null and ''!=country">
+            #{country},
+        </if>
+        <if test="province!=null and ''!=province">
+            #{province},
+        </if>
+        <if test="city!=null and ''!=city">
+            #{city},
+        </if>
+        <if test="language!=null and ''!=language">
+            #{language},
+        </if>
+
+        <if test="creator!=null and ''!=creator">
+            #{creator},
+        </if>
+        <if test="updator!=null and ''!=updator">
+            #{updator},
+        </if>
+
+        now(),
+        'N')
+
+
+    </insert>
+
+
+    <!-- 修改 -->
+    <update id="updateInfo" parameterType="dto">
+        update invest_user
+        set
+        <if test="null!=sp_openid  and ''!= sp_openid">
+            sp_openid = #{sp_openid},
+        </if>
+        <if test="null!=wx_PicURL  and ''!= wx_PicURL">
+            wx_PicURL = #{wx_PicURL},
+        </if>
+        <if test="null!=wx_NickName  and ''!= wx_NickName">
+            wx_NickName = #{wx_NickName},
+        </if>
+        <if test="null!=pId  and ''!= pId">
+            pId = #{pId},
+        </if>
+        <if test="null!=phone  and ''!= phone">
+            phone = #{phone},
+        </if>
+        <if test="null!=wx_UnionID  and ''!= wx_UnionID">
+            wx_UnionID = #{wx_UnionID},
+        </if>
+        <if test="null!=teamID  and ''!= teamID">
+            teamID = #{teamID},
+        </if>
+        <if test="null!=sex  and ''!= sex">
+            sex = #{sex},
+        </if>
+        <if test="null!=country  and ''!= country">
+            country = #{country},
+        </if>
+        <if test="null!=province  and ''!= province">
+            province = #{province},
+        </if>
+        <if test="null!=city  and ''!= city">
+            city = #{city},
+        </if>
+        <if test="null!=language  and ''!= language">
+            language = #{language},
+        </if>
+
+        <if test="null!=creator  and ''!= creator">
+            creator = #{creator},
+        </if>
+        <if test="null!=birthday  and ''!= birthday">
+            birthday = #{birthday},
+        </if>
+
+        update_time = now(),
+        updator = #{updator}
+        where id = #{id}
+    </update>
+
+
+</mapper>

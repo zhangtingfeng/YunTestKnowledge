@@ -1,0 +1,75 @@
+# ??????
+#ddd  java -jar sp21-toolsservice-0.0.1-SNAPSHOT.jar --spring.config.location=application.yml
+#???????????
+spring:
+  application:
+    name: teachersub-service
+  thymeleaf:
+    cache: false # ???? thymeleaf ????
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  datasource:
+    username: root
+    password: Q111111
+    url: jdbc:mysql://219.235.0.112:3306/learn_knowledge?serverTimezone=GMT&useSSL=false&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    # ����Ϊ���ӳصĲ������ã�Ӧ�õ�������������Դ��
+    # ��ʼ����С����С�����
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    # ���û�ȡ���ӵȴ���ʱ��ʱ��
+    maxWait: 60000
+    # ���ü����òŽ���һ�μ�⣬�����Ҫ�رյĿ������ӣ���λ�Ǻ���
+    timeBetweenEvictionRunsMillis: 60000
+    # ����һ�������ڳ�����С�����ʱ�䣬��λ�Ǻ���
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # ��PSCache������ָ��ÿ��������PSCache�Ĵ�С
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # ���ü��ͳ�����ص�filters��ȥ�����ؽ���sql�޷�ͳ�ƣ�'wall'���ڷ���ǽ���˴���filter�޸ĵĵط�
+    filters:
+      commons-log.connection-logger-name: stat,wall,log4j
+    # ͨ��connectProperties��������mergeSql���ܣ���SQL��¼
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # �ϲ����DruidDataSource�ļ������
+    useGlobalDataSourceStat: true
+  sleuth:
+    sampler:
+      probability: 1.0   #2.0后percentage改为probability
+  zipkin:
+    base-url: http://127.0.0.1:9411
+
+
+server:
+  port: 48026
+  servlet:
+    context-path: /${spring.application.name}
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:48011/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+mybatis:
+  #���û�п��Բ�д
+  #config-location: classpath:mybatisConfig.xml
+  mapper-locations: classpath:mapper/*.xml
+  config-location: classpath:mybatis.cfg.xml    #  mybatis主配置文件所在路径
+  type-aliases-package: cn.tedu.sp00entity
+
+
+mapper:
+  not-empty: false
+  identity: MYSQL
