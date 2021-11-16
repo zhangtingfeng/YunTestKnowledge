@@ -50,7 +50,11 @@ public class CommonConController extends BaseController {
             if (!StringUtils.isNotBlank(sql)) {
                 sql = "queryList";
             }
-
+            String AttachExtentFileNamesql = dto.getAsString("Attachsql");
+            if (StringUtils.isNotBlank(AttachExtentFileNamesql)) {
+                AttachExtentFileNamesql = java.net.URLDecoder.decode(AttachExtentFileNamesql,"UTF-8");
+                dto.put("Attachsql",AttachExtentFileNamesql);
+            }
             List<Dto> paramList = bizService.queryForPageCenter(dto.getAsString("t") + "." + sql, dto);
             retDto.put("rows", paramList);
             retDto.put("rowsCount", paramList.size());

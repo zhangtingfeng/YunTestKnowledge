@@ -8,13 +8,19 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -23,8 +29,15 @@ import sun.misc.BASE64Decoder;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -390,6 +403,163 @@ public class CommonUtil {
         }
     }
 
+    /*
+    ///https://blog.csdn.net/qq_42561919/article/details/100065675
+        使用HttpClient发送Https请求时，出现异常为：
+        PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+        出现这个异常的原因为，客户端向服务器发送https请求时，会验证服务端的证书状态，可以设置信任所有证书，绕过这一步。
+        查看HttpClient官方文档，示例如下：
+                ————————————————
+        版权声明：本文为CSDN博主「有错误先debug」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+        原文链接：https://blog.csdn.net/qq_42561919/article/details/100065675
+        */
+    public static CloseableHttpClient createSSLClientDefault() {
+        try {
+            //使用 loadTrustMaterial() 方法实现一个信任策略，信任所有证书
+            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                // 信任所有
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    return true;
+                }
+            }).build();
+            //NoopHostnameVerifier类:  作为主机名验证工具，实质上关闭了主机名验证，它接受任何
+            //有效的SSL会话并匹配到目标主机。
+            HostnameVerifier hostnameVerifier = NoopHostnameVerifier.INSTANCE;
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+            return HttpClients.custom().setSSLSocketFactory(sslsf).build();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        }
+        return HttpClients.createDefault();
+
+    }
+
+    //get请求            ArrayList<String> ddd=new ArrayList<String>();
+    //            ddd.add("1");
+    //            ddd.add("2");
+    public static String HttpClientGetSSL(String url,ArrayList<String> DtoHeaderList) throws Exception {
+        // 获取http客户端可以直接使用SSLContext来构建实例，代码如下：
+        CloseableHttpClient client = createSSLClientDefault();//HttpClients.createDefault();
+
+
+        ///trustAllHttpsCertificates();
+        //HttpsURLConnection.setDefaultHostnameVerifier(hv);
+        // 通过httpget方式来实现我们的get请求
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.addHeader("content-type", "application/json");
+        if (DtoHeaderList!=null){
+            DtoHeaderList.forEach((value) -> {
+                String[] strValueList=value.split("###");
+                //String strValue=value;
+
+                httpGet.addHeader(strValueList[0],strValueList[1]);
+            });
+        }
+        // 通过client调用execute方法，得到我们的执行结果就是一个response，所有的数据都封装在response里面了
+        CloseableHttpResponse Response = client.execute(httpGet);
+        // 所有的响应的数据，也全部都是封装在HttpEntity里面
+        HttpEntity entity = Response.getEntity();
+        // 通过EntityUtils 来将我们的数据转换成字符串
+        String str = EntityUtils.toString(entity, "UTF-8");
+        // EntityUtils.toString(entity)
+        //System.out.println(str);
+        // 关闭
+        Response.close();
+        return str;
+    }
+
+    //delete
+    public static String HttpClientDeleteSSL(String url) throws Exception {
+        // 获取http客户端可以直接使用SSLContext来构建实例，代码如下：
+        CloseableHttpClient client = createSSLClientDefault();//HttpClients.createDefault();
+
+
+        ///trustAllHttpsCertificates();
+        //HttpsURLConnection.setDefaultHostnameVerifier(hv);
+        // 通过httpget方式来实现我们的get请求
+        HttpDelete httpDelete = new HttpDelete(url);
+        // 通过client调用execute方法，得到我们的执行结果就是一个response，所有的数据都封装在response里面了
+        CloseableHttpResponse Response = client.execute(httpDelete);
+        // 所有的响应的数据，也全部都是封装在HttpEntity里面
+        HttpEntity entity = Response.getEntity();
+        // 通过EntityUtils 来将我们的数据转换成字符串
+        String str = EntityUtils.toString(entity, "UTF-8");
+        // EntityUtils.toString(entity)
+        //System.out.println(str);
+        // 关闭
+        Response.close();
+        return str;
+    }
+
+    public static String HttpClientPostSSL(String url, String  strjsonObject) throws Exception {
+        // 获取http客户端可以直接使用SSLContext来构建实例，代码如下：
+        CloseableHttpClient client = createSSLClientDefault();//HttpClients.createDefault();
+
+        //  final CloseableHttpClient client = HttpClients.createDefault();
+        final HttpPost httpPost = new HttpPost(url);
+        StringEntity s = new StringEntity(strjsonObject, "utf-8");
+        s.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+        s.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,                "application/json"));
+        httpPost.setEntity(s);
+        System.out.println("请求地址：" + url);
+        httpPost.setHeader("Content-type", "application/json");
+        httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        String str = EntityUtils.toString(entity, "UTF-8");
+        System.out.println(str);
+        // 关闭
+        response.close();
+
+        return str;
+    }
+
+
+    private static void trustAllHttpsCertificates() throws Exception {
+        javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
+        javax.net.ssl.TrustManager tm = new miTM();
+        trustAllCerts[0] = tm;
+        javax.net.ssl.SSLContext sc = javax.net.ssl.SSLContext
+                .getInstance("SSL");
+        sc.init(null, trustAllCerts, null);
+        javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc
+                .getSocketFactory());
+    }
+
+    static class miTM implements javax.net.ssl.TrustManager,
+            javax.net.ssl.X509TrustManager {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        public boolean isServerTrusted(
+                java.security.cert.X509Certificate[] certs) {
+            return true;
+        }
+
+        public boolean isClientTrusted(
+                java.security.cert.X509Certificate[] certs) {
+            return true;
+        }
+
+        public void checkServerTrusted(
+                java.security.cert.X509Certificate[] certs, String authType)
+                throws java.security.cert.CertificateException {
+            return;
+        }
+
+        public void checkClientTrusted(
+                java.security.cert.X509Certificate[] certs, String authType)
+                throws java.security.cert.CertificateException {
+            return;
+        }
+    }
 
     //get请求
     public static String HttpClientGet(String url) throws Exception {
@@ -463,5 +633,24 @@ public class CommonUtil {
         response.close();
 
         return str;
+    }
+
+    /**
+     * 计算得到MongoDB存储的日期，（默认情况下mongo中存储的是标准的时间，中国时间是东八区，存在mongo中少8小时，所以增加8小时）
+     * http://www.iteye.com/problems/88507
+     *
+     * @author: Gao Peng
+     * @date: 2016年5月4日 上午9:26:23
+     * @param: @param
+     *             date
+     * @param: @return
+     * @return: Date
+     */
+    public static Date getMongoDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(date);
+        ca.add(Calendar.HOUR_OF_DAY, 8);
+        return ca.getTime();
     }
 }

@@ -21,8 +21,8 @@ public class SimpleScheduleConfig {
         System.err.println("执行定时任务1: " + LocalDateTime.now());
     }
 
-///"0 15 10 ? * *" 每天上午10:15触发
-    @Scheduled(cron = "0 35 5 ? * *")
+///"0 15 10 ? * *" 每天上午6:55触发
+    @Scheduled(cron = "0 35 7 ? * *")
     public void configureTasks17() throws Exception {
         // new DayNewsController().SaveDiskSpGet(null);
         String Strlunar = "http://127.0.0.1:48024/teacher-service/dayNews/SpGet";

@@ -50,6 +50,19 @@
     </select>
 
 
+
+    <!-- 查询 -->
+    <select id="queryHotHistoryList" parameterType="map" resultType="dto">
+        SELECT a1.*,a2.* from (
+        SELECT count(id) as repeatcount ,WhichFuntionID,max(id) as id FROM `invest_visit_path`  where FuntionType='historyKnowledge' GROUP BY WhichFuntionID ORDER BY repeatcount desc) a1
+        left join invest_visit_path a2
+        on a1.id=a2.id
+
+        <if test="null!=start">
+            limit #{start},#{end}
+        </if>
+    </select>
+
     <!-- 查询 -->
     <select id="queryList" parameterType="map" resultType="dto">
         SELECT
@@ -67,6 +80,12 @@
 
     <!-- 查询 -->
     <select id="queryListCount" parameterType="map" resultType="dto">
+        SELECT count(1) from (
+        SELECT count(id) as repeatcount ,WhichFuntionID,max(id) as id FROM `invest_visit_path`  where FuntionType='historyKnowledge' GROUP BY WhichFuntionID) t1
+    </select>
+
+    <!-- 查询 -->
+    <select id="queryHotListCount" parameterType="map" resultType="dto">
         SELECT
         count(a.id) as total
         FROM invest_visit_path a

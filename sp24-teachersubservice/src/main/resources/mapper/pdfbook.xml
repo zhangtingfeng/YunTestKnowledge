@@ -22,8 +22,8 @@
             and a.pid = #{pid}
         </if>
 
-        <if test="null!=ExtentFileName  and ''!= ExtentFileName">
-            and a.ExtentFileName = #{ExtentFileName}
+        <if test="null!=Type  and ''!= Type">
+            and a.Type = #{Type}
         </if>
 
 
@@ -126,25 +126,7 @@
     </select>
 
 
-    <!-- 查询 -->
-    <select id="queryLikeList" parameterType="map" resultType="dto">
-        SELECT
-        <if test="null!=field">
-            ${field}
-        </if>
-        <if test="null==field">
-            *
-        </if>
-        FROM pdfbook where ${AttachExtentFileNamesql}
-        <if test="null!=start">
-            limit ${start},${end}
-        </if>
 
-    </select>
-
-    <select id="queryLikeListCount" parameterType="map" resultType="dto">
-        SELECT count(id) as total FROM pdfbook  where ${AttachExtentFileNamesql}
-    </select>
 
     <!-- 查询 -->
     <select id="queryListCount" parameterType="map" resultType="dto">
