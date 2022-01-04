@@ -2,54 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><!-- 参数管理手工映射SQL语句 -->
 <!-- 参数管理手工映射SQL语句 -->
-<mapper namespace="pdfbook">
+<mapper namespace="pdfbookfolder">
 
 
     <sql id="sql_where">
         <if test="null!=id  and ''!= id">
             and a.id = #{id}
         </if>
-        <if test="null!=BOOKName  and ''!= BOOKName">
-            and a.BOOKName = #{BOOKName}
-        </if>
-        <if test="null!=TextDes  and ''!= TextDes">
-            and a.TextDes = #{TextDes}
-        </if>
         <if test="null!=BookPath  and ''!= BookPath">
             and a.BookPath = #{BookPath}
+        </if>
+        <if test="null!=BOOKName  and ''!= BOOKName">
+            and a.BOOKName = #{BOOKName}
         </if>
         <if test="null!=pid  and ''!= pid">
             and a.pid = #{pid}
         </if>
-
-        <if test="null!=Type  and ''!= Type">
-            and a.Type = #{Type}
+        <if test="null!=ExtentFileName  and ''!= ExtentFileName">
+            and a.ExtentFileName = #{ExtentFileName}
         </if>
 
-
-        <if test="null!=Attachsql  and ''!= Attachsql">
-            and ${Attachsql}
+        <if test="null!=Sort  and ''!= Sort">
+            and a.Sort = #{Sort}
         </if>
 
+        <if test="null!=FileMd5  and ''!= FileMd5">
+            and a.FileMd5 = #{FileMd5}
+        </if>
 
+        <if test="null!=FileLength  and ''!= FileLength">
+            and a.FileLength = #{FileLength}
+        </if>
     </sql>
 
     <!-- 删除 -->
     <delete id="deleteInfo" parameterType="map">
-        UPDATE pdfbook set is_delete = 'Y' WHERE id = #{id}
+        UPDATE pdfbookfolder set is_delete = 'Y' WHERE id = #{id}
     </delete>
 
 
     <!-- 删除 -->
     <delete id="deleteTrueInfo" parameterType="map">
-        DELETE  a FROM  pdfbook a
+        DELETE  a FROM  pdfbookfolder a
         WHERE 1=1  <include refid="sql_where"/>
     </delete>
 
     <!-- 查询 -->
     <select id="getInfo" parameterType="map" resultType="dto">
         SELECT a.*
-        FROM pdfbook a
+        FROM pdfbookfolder a
         WHERE 1=1 and a.is_delete = 'N'
         <include refid="sql_where"/>
         limit 0,1
@@ -66,7 +67,7 @@
             a.*
         </if>
         FROM
-        pdfbook a
+        pdfbookfolder a
         WHERE 1=1 and a.is_delete = 'N'
         <include refid="sql_where"/>
         ORDER BY
@@ -80,35 +81,35 @@
     </select>
 
 
-    <!-- 查询 -->
+    <!-- 查询
     <select id="queryHotList" parameterType="map" resultType="dto">
         select a.*,b.*  from (select WhichFuntionID,count(WhichFuntionID) as descOrderByCount from invest_visit_BookPath
         where FuntionType='learnKnowledge' and WhichFuntionID>0  group by WhichFuntionID
         order by descOrderByCount desc
         ) a
-        left JOIN pdfbook b
+        left JOIN pdfbookfolder b
         on a.WhichFuntionID=b.id
         where ExtentFileName not in ('folder')
         <if test="null!=start">
             limit ${start},${end}
         </if>
-    </select>
-    <!-- 查询 -->
+    </select>-->
+    <!-- 查询
     <select id="queryHotListCount" parameterType="map" resultType="dto">
         select count(a.WhichFuntionID) as total  from (select WhichFuntionID,count(WhichFuntionID) as descOrderByCount from invest_visit_BookPath
         where FuntionType='learnKnowledge' and WhichFuntionID>0  group by WhichFuntionID
         order by descOrderByCount desc
         ) a
-        left JOIN pdfbook b
+        left JOIN pdfbookfolder b
         on a.WhichFuntionID=b.id
         where ExtentFileName not in ('folder')
     </select>
-
-    <!-- 查询 -->
+-->
+    <!-- 查询
     <select id="queryClassList" parameterType="map" resultType="dto">
-        SELECT * from (SELECT * FROM pdfbook where pid=#{pid} and ${AttachExtentFileNamesql}
+        SELECT * from (SELECT * FROM pdfbookfolder where pid=#{pid} and ${AttachExtentFileNamesql}
         UNION
-        SELECT * FROM pdfbook where pid in (SELECT id FROM pdfbook where pid=#{pid} and ExtentFileName in ('folder')) and ${AttachExtentFileNamesql}
+        SELECT * FROM pdfbookfolder where pid in (SELECT id FROM pdfbookfolder where pid=#{pid} and ExtentFileName in ('folder')) and ${AttachExtentFileNamesql}
         ) b
         <if test="null!=start">
             limit ${start},${end}
@@ -117,14 +118,14 @@
     </select>
 
     <select id="queryClassListCount" parameterType="map" resultType="dto">
-        select count(c.id) as total  from( SELECT id from (SELECT id FROM pdfbook where pid=#{pid} and ${AttachExtentFileNamesql}
+        select count(c.id) as total  from( SELECT id from (SELECT id FROM pdfbookfolder where pid=#{pid} and ${AttachExtentFileNamesql}
         UNION
-        SELECT id FROM pdfbook where pid in (SELECT id FROM pdfbook where pid=#{pid} and ExtentFileName in ('folder')) and ${AttachExtentFileNamesql}
+        SELECT id FROM pdfbookfolder where pid in (SELECT id FROM pdfbookfolder where pid=#{pid} and ExtentFileName in ('folder')) and ${AttachExtentFileNamesql}
         ) b
         ) c
 
     </select>
-
+-->
 
 
 
@@ -132,15 +133,15 @@
     <select id="queryListCount" parameterType="map" resultType="dto">
         SELECT
         count(a.id) as total
-        FROM pdfbook a
+        FROM pdfbookfolder a
         WHERE 1=1 and a.is_delete = 'N'
 
         <include refid="sql_where"/>
     </select>
 
-    <!-- 插入 -->
+    <!-- 插入
     <insert id="saveInfo" parameterType="dto">
-        INSERT INTO pdfbook
+        INSERT INTO pdfbookfolder
         (
         <if test="id!=null and ''!=id">
             id,
@@ -230,11 +231,11 @@
 
 
     </insert>
+-->
 
-
-    <!-- 修改 -->
+    <!-- 修改
     <update id="updateInfo" parameterType="dto">
-        update pdfbook
+        update pdfbookfolder
         set
         <if test="null!=id  and ''!= id">
             id = #{id},
@@ -279,6 +280,6 @@
         updator = #{updator}
         where id = #{id}
     </update>
-
+ -->
 
 </mapper>
