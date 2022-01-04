@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,10 +33,18 @@ public class getNewsController extends BaseController {
 
     @ResponseBody
     @PostMapping(value = "/download365News")
-    public JsonResult<?> download365News(@RequestBody JsonResult JsonResultbase64) throws IOException, ParseException {
+    public JsonResult<?> download365News() throws IOException, ParseException {
         JsonResult<?> result = new JsonResult<>();
 
+        int intWeek=getWeek(new Date());
+        String strPath=fouploadPropertieso.getNetRootpath()+File.separator+fouploadPropertieso.getWeeksPic_url()+ File.separator+intWeek;
+        ArrayList<String> ddPubFilesdd= FileOperate.getPubFiles(strPath);
+        int ran2 = (int) (Math.random()*(ddPubFilesdd.size()-0)+0);
+
         try {
+
+            mongoServiceImpl.savelog("sp11-crawlnew", "download365News_Start", "download365News");
+
 
 
 
@@ -72,9 +81,24 @@ public class getNewsController extends BaseController {
 
                 String strDayNew = mastheadDayNew.html();
                 String[] strList = strDayNew.split("<br>");
-
+                if (strList.length<15){
+                    mastheadDayNew=mastheadpost_body.select("p").get(2);
+                    strDayNew = mastheadDayNew.html();
+                    strList = strDayNew.split("<br>");
+                    if (strList.length<15){
+                        mastheadDayNew=mastheadpost_body.select("p").get(3);
+                        strDayNew = mastheadDayNew.html();
+                        strList = strDayNew.split("<br>");
+                        if (strList.length<15){
+                            mastheadDayNew=mastheadpost_body.select("p").get(0);
+                            strDayNew = mastheadDayNew.html();
+                            strList = strDayNew.split("<br>");
+                        }
+                    }
+                }
                 ArrayList<String> ddddArrayList = new ArrayList<String>();
                 for (int i = 2; i < strList.length - 1; i++) {
+                    if (strList[i].contains("【微语】") || strList[i].contains("来源：")) continue;;
                     String[] strEachList = strList[i].split("、");
                     String strAdd = "";
                     for (int j = 1; j < strEachList.length; j++) {
@@ -92,20 +116,41 @@ public class getNewsController extends BaseController {
                     numbersDtoList.add(curDto);
                 }
 
-                Dto ResultDto=new BaseDto();
-                ResultDto.put("bulletinNewsList",numbersDtoList);
-                Element masimg=mastheadpost_body.select("p").get(4);
+
+                Element masimg=mastheadpost_body.select("p.f_center").get(2);
                 Element img=masimg.select("img[src]").first();
                 String src = img.attr("src");//获取到src的值
                 String strPicPath=saveURL(src);
 
 
-                 ResultDto.put("NewsAdsPicUrl","https://admin.edu.eggsoft.cn/test/StaticImg/edu/News/"+strPicPath);
+
+
+
+
+
+
+
+                Dto ResultDto=new BaseDto();
+                ResultDto.put("bulletinNewsList",JsonUtil.serialize(numbersDtoList));
+                ResultDto.put("NewsWeeksPicUrl",ddPubFilesdd.get(ran2).replace("\\","/").replace(fouploadPropertieso.getNetRootpath(),fouploadPropertieso.getNetUrl()));
+             //  ResultDto.put("NewsAdsPicUrl",strPicPath);
+                ResultDto.put("NewsAdsPicUrl",fouploadPropertieso.getNetUrl()+"/"+fouploadPropertieso.getRawlMorning_url()+"/"+strPicPath);
+
+             //   result = JsonResult.ok(ResultDto);
+
+
                // Dto ResultDtoObj=new BaseDto();
               //  ResultDtoObj.put("data",JsonUtil.serialize(ResultDto));
+                mongoServiceImpl.savelog("sp11-crawlnew", "download365News", ResultDto);
+
                 result = JsonResult.ok(ResultDto);
             } else {
-                result = JsonResult.err("No this time");
+                mongoServiceImpl.savelog("downloadExcel", "download365News", "No this time");
+
+                Dto ResultDto=new BaseDto();
+                ResultDto.put("NewsWeeksPicUrl",ddPubFilesdd.get(ran2).replace("\\","/").replace(fouploadPropertieso.getNetRootpath(),fouploadPropertieso.getNetUrl()));
+                result = JsonResult.ok(ResultDto).code(1201);
+               // result = JsonResult.err("No this time");
             }
 
 
@@ -170,18 +215,32 @@ public Elements select(String cssQuery)
 
 
         } catch (Exception e) {
-            debugLogUtil.send("downloadExcel", "Exception=", e.getMessage());
+           String strErr= mongoServiceImpl.savelog("downloadExcel", "Exception=", e);
             e.printStackTrace();
-            result = JsonResult.err(e.getLocalizedMessage());
+          //  result = JsonResult.err(strErr);
+
+            Dto ResultDto=new BaseDto();
+            ResultDto.put("NewsWeeksPicUrl",ddPubFilesdd.get(ran2).replace("\\","/").replace(fouploadPropertieso.getNetRootpath(),fouploadPropertieso.getNetUrl()));
+            result = JsonResult.ok(ResultDto).code(1202);
+
 
         }
         return result;
     }
 
 
+    private int getWeek(Date date) {
 
-    private String saveURL(String url) throws Exception {
-        url="https://nimg.ws.126.net/?url=http%3A%2F%2Fdingyue.ws.126.net%2F2021%2F1031%2Fd6f900bbj00r1tbnf0025d000u001hcp.jpg&thumbnail=650x2147483647&quality=80&type=jpg";
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int week_index = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        if (week_index < 0) {
+            week_index = 0;
+        }
+        return week_index;
+    }
+    private String getWeeksURL(String url) throws Exception {
+        // url="https://nimg.ws.126.net/?url=http%3A%2F%2Fdingyue.ws.126.net%2F2021%2F1031%2Fd6f900bbj00r1tbnf0025d000u001hcp.jpg&thumbnail=650x2147483647&quality=80&type=jpg";
         URL url1 = new URL(url);
         if("https".equalsIgnoreCase(url1.getProtocol())){
             SslUtils.ignoreSsl();
@@ -202,7 +261,37 @@ public Elements select(String cssQuery)
         {
             strJpg=".png";
         }
-        FileOutputStream out = new FileOutputStream(fouploadPropertieso.getServerIMGUpload()+"/"+fouploadPropertieso.getImg_url()+"/"+date+strJpg);
+        FileOutputStream out = new FileOutputStream(fouploadPropertieso.getNetRootpath()+"/"+fouploadPropertieso.getRawlMorning_url()+"/"+date+strJpg);
+        int j = 0;
+        while ((j = inputStream.read()) != -1) {
+            out.write(j);
+        }
+        inputStream.close();
+        return  date+strJpg;
+    }
+    private String saveURL(String url) throws Exception {
+        //url="https://nimg.ws.126.net/?url=http%3A%2F%2Fdingyue.ws.126.net%2F2021%2F1031%2Fd6f900bbj00r1tbnf0025d000u001hcp.jpg&thumbnail=650x2147483647&quality=80&type=jpg";
+        URL url1 = new URL(url);
+        if("https".equalsIgnoreCase(url1.getProtocol())){
+            SslUtils.ignoreSsl();
+        }
+        URLConnection uc = url1.openConnection();
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH_mm_ss-SSS");
+        String date = sdf.format(new Date());
+
+        InputStream inputStream = uc.getInputStream();
+
+        String strJpg=".jpg";
+        if (url.contains("jpg") || url.contains("jpeg"))
+        {
+        }
+        else if (url.contains("png"))
+        {
+            strJpg=".png";
+        }
+        FileOutputStream out = new FileOutputStream(fouploadPropertieso.getNetRootpath()+"/"+fouploadPropertieso.getRawlMorning_url()+"/"+date+strJpg);
         int j = 0;
         while ((j = inputStream.read()) != -1) {
             out.write(j);

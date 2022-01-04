@@ -6,17 +6,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class myuploadProperties {
 
-    @Value("${myupload.serverIMGUpload}")
-    private String serverIMGUpload;
-
-    public String getServerIMGUpload() {
-        return serverIMGUpload;
+    @Value("${myupload.netRootpath}")
+    private String netRootpath;
+    public String getNetRootpath() {
+        return netRootpath;
     }
 
-    @Value("${myupload.img_url}")
-    private String img_url;
-
-    public String getImg_url() {
-        return img_url;
+    @Value("${myupload.rawlMorning_url}")
+    private String rawlMorning_url;
+    public String getRawlMorning_url() {
+        return rawlMorning_url;
     }
+
+    @Value("${myupload.weeksPic_url}")
+    private String weeksPic_url;
+    public String getWeeksPic_url() {
+        return weeksPic_url;
+    }
+
+    @Value("${myupload.netUrl}")
+    private String netUrl;
+    public String getNetUrl() {
+        return netUrl;
+    }
+
+
 }

@@ -1,0 +1,41 @@
+#!/bin/bash
+# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES
+#
+# It is highly advisable to create own systemd services or udev rules
+# to run scripts during boot instead of using this file.
+#
+# In contrast to previous versions due to parallel execution during boot
+# this script will NOT be run after all other services.
+#
+# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure
+# that this script will be executed during boot.
+
+touch /var/lock/subsys/local
+
+/gotonets/autoexec.bat
+
+/www/server/nginx/sbin/nginx -c /www/server/nginx/conf/nginx.conf
+
+echo "/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf" >> /etc/rc.local
+
+/etc/init.d/bt start
+
+
+exit 0
+
+cd /www/jarservice/SpringClound2/sp05_eurekaservice
+./sp05Eureka.sh
+
+
+cd /www/jarservice/SpringClound2/sp06-ribbon
+./sp06ribbon.sh
+/www/jarservice/SpringClound2/sp06-ribbon/sp06ribbon.sh
+
+cd /www/jarservice/SpringClound2/sp25-Student
+./sp25-studentservice.sh
+
+cd /www/jarservice/SpringClound2/sp24-teachersubservice
+./sp24teachersub.sh
+
+cd /www/jarservice/SpringClound2/sp24-teacherservice
+./sp24teacher.sh

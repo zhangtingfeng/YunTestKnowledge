@@ -1,0 +1,9 @@
+#!/bin/bash
+#chkconfig: 345 99 99
+#description:sp06-ribbon server
+#processname:sp06-ribbon
+case $1 in
+   start) /www/jarservice/SpringClound2/sp06-ribbon/sp.sh;; # 开启redis的命令   
+   stop) su root /www/jarservice/SpringClound2/sp06-ribbon/sp.sh;; # 启动杀死redis进程的脚本
+   *) echo "sp06-ribbon start|stop" ;;         
+esac 

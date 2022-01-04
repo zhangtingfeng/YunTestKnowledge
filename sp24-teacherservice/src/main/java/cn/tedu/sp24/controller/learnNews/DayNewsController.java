@@ -128,15 +128,22 @@ public class DayNewsController extends BaseController {
 
             //      Dto dtolzmy = myJSONUtil2.parseJSON2Dto(myJsonUtil.serialize(Dtolzmynewslist.get(0)));
             //     strContent += "[意林]：{" + dtolzmy.getAsString("saying") + "}" + dtolzmy.getAsString("transl") + "/n";
-            String Strdownload365News = "http://127.0.0.1:48016/sp11crawlnew-service/getNews/download365News";
-            String strdownload365Newsjoke = CommonUtil.HttpClientPostSSL(Strdownload365News,"{}");
-            Dto dtolzmy365News = JSONUtil2.parseJSON2Dto(strdownload365Newsjoke);
-            if (200 == dtolzmy365News.getAsInteger("code")) {
-                Dto ddDtod =JSONUtil2.parseJSON2Dto( JsonUtil.serialize(dtolzmy365News.get("data")));
+            //String Strdownload365News = "http://127.0.0.1:48016/sp11crawlnew-service/getNews/download365News";
+            //String strdownload365Newsjoke = CommonUtil.HttpClientPostSSL(Strdownload365News,"{}");
+
+            JsonResult<?> jsonResult = templateEureka.postForObject(String.format("http://%s/%s/getNews/download365News", "sp11crawlnew-service", "sp11crawlnew-service"), null, JsonResult.class);
+
+
+           // Dto dtolzmy365News = JSONUtil2.parseJSON2Dto(strdownload365Newsjoke);
+            if (200 == jsonResult.getCode()) {
+               // Dto ddDtod = (Dto) jsonResult.getData();
+                Dto ddDtod =webUtils.getParamAsDto(jsonResult.datetoMap());
+                        //JSONUtil2.parseJSON2Dto( JsonUtil.serialize(dtolzmy365News.get("data")));
                //dtolzmy365News.get("data");
 
-                paramReturn.put("bulletinNewsList", ddDtod.getAsList("bulletinNewsList"));
+                paramReturn.put("bulletinNewsList", JSONUtil2.parseJSON2ListDto(ddDtod.getAsString("bulletinNewsList")));
                 paramReturn.put("NewsAdsPicUrl", ddDtod.getAsString("NewsAdsPicUrl"));
+                paramReturn.put("NewsWeeksPicUrl", ddDtod.getAsString("NewsWeeksPicUrl"));
 
             } else {
                 Dto paramqueryList = new BaseDto();
@@ -145,8 +152,11 @@ public class DayNewsController extends BaseController {
                 // paramqueryList.put("Attachsql","UNIX_TIMESTAMP(create_time) between unix_timestamp(CAST((CAST(SYSDATE()AS DATE) + INTERVAL 6 HOUR-INTERVAL 1 DAY)AS DATETIME)) and unix_timestamp(CAST((CAST(SYSDATE()AS DATE) + INTERVAL 6 HOUR)AS DATETIME))");
                 paramqueryList.put("Attachsql", "UNIX_TIMESTAMP(create_time) between unix_timestamp(now()-INTERVAL 24 HOUR) and unix_timestamp(now())");
                 List paramList = bizService.queryForList("learn_resource.queryList", paramqueryList);
+                if (1201 == jsonResult.getCode() || 1202 == jsonResult.getCode()) {
+                    Dto ddDtod =webUtils.getParamAsDto(jsonResult.datetoMap());
+                    paramReturn.put("NewsWeeksPicUrl", ddDtod.getAsString("NewsWeeksPicUrl"));
 
-
+                }
                 paramReturn.put("bulletinNewsList", paramList);
             }
 
@@ -157,6 +167,9 @@ public class DayNewsController extends BaseController {
             saveDtoList.put("Title", strTitle);
             saveDtoList.put("Content", JsonUtil.serialize(paramReturn));
             bizService.saveInfo("learn_news.saveInfo", saveDtoList);
+
+            mongoServiceImpl.savelog("sp24-teacherservice", "SpGet", paramReturn);
+
             result = JsonResult.ok(paramReturn);
             //result.setData(info);
         } catch (Exception e) {

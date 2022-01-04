@@ -13,7 +13,7 @@ spring:
   datasource:
     username: root
     password: Q111111
-    url: jdbc:mysql://219.235.0.112:3306/learn_knowledge?serverTimezone=GMT&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://127.0.0.1:3306/learn_knowledge?serverTimezone=GMT&useSSL=false&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     # ����Ϊ���ӳصĲ������ã�Ӧ�õ�������������Դ��
@@ -57,7 +57,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:48011/eureka
+      defaultZone: http://219.235.6.205:48011/eureka
   instance:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@

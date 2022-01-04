@@ -322,6 +322,7 @@ public class CommonConController extends BaseController {
         try {
             Dto member = redisServiceImpl.getObject(JsonResultbase64.getToken(), BaseDto.class);
 
+            mongoServiceImpl.savelog("student-service","editInfo",inDto);
 
             if (inDto.getAsLong("id") != null) {// 修改
                 if (!StringUtils.isNotEmpty(inDto.getAsString("method"))) {

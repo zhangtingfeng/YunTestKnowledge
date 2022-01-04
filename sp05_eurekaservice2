@@ -1,0 +1,9 @@
+#!/bin/bash
+#chkconfig: 345 99 99
+#description:sp21-toolsservice server
+#processname:sp21-toolsservice
+case $1 in
+   start) /www/jarservice/SpringClound2/sp21-toolsservice/sp.sh;; # 开启redis的命令   
+   stop) su root /www/jarservice/SpringClound2/sp21-toolsservice/sp.sh;; # 启动杀死redis进程的脚本
+   *) echo "sp21-toolsservice start|stop" ;;         
+esac 

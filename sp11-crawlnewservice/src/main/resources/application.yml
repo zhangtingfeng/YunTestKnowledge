@@ -48,11 +48,11 @@ spring:
     sampler:
       probability: 1.0   #2.0后percentage改为probability
   zipkin:
-    base-url: http://localhost:9411
+    base-url: http://219.235.0.112:9411
 
   redis:
-    ip: 127.0.0.1
-    host: 127.0.0.1
+    ip: 219.235.6.205
+    host: 219.235.6.205
     port: 6379                  #password: fa$17p%w0%nsQJz2    自助重启平台：http://www.gotonets.com/gotonets/    您的用户名为：900161526    初始密码为：121212
     #password: rootQAZ /etc/redis  219.235.6.205 logfile /var/log/redis/redis-server.log  日志地址
     password: foo123456bared
@@ -92,7 +92,7 @@ mybatis:
 eureka:
   client:
     service-url:
-      defaultZone: http://127.0.0.1:48011/eureka
+      defaultZone: http://219.235.6.205:48011/eureka
       fetch-registry: true
       register-with-eureka: true
   instance:
@@ -104,5 +104,7 @@ mapper:
   identity: MYSQL
 
 myupload:
-  serverIMGUpload: C:/temp
-  img_url: StaticImg/goods
+  netRootpath: C:/temp
+  rawlMorning_url: StaticImg/goodMornings/RawlMorning
+  weeksPic_url: StaticImg/goodMornings/WeeksPic
+  netUrl: https://resource.know.eggsoft.cn

@@ -1,0 +1,64 @@
+CentOS6.5将shell脚本设置为服务和开机启动的方法 service
+
+https://blog.csdn.net/Coxhuang/article/details/86941319
+#1 环境
+centos 6.9 (6和7有区别)
+1
+#2 需求分析
+把redis启动配置成service
+#3 开始
+新增杀死redis进程脚本
+
+vim /opt/redis_stop.sh
+1
+#!/bin/sh               
+PROCESS=`ps -ef|grep redis|grep -v grep|grep -v PPID|awk '{ print $2}'`
+for i in $PROCESS         
+do
+  kill -9 $i        
+done 
+1
+2
+3
+4
+5
+6
+新增脚本
+
+vim /etc/rc.d/init.d/myredis
+1
+#!/bin/bash
+#chkconfig: 345 99 99
+#description:myredis server
+#processname:myredis
+case $1 in
+   start) /opt/redis-4.0.2/src/./redis-server;; # 开启redis的命令   
+   stop) su root /opt/redis_stop.sh start;; # 启动杀死redis进程的脚本
+   *) echo "require start|stop" ;;         
+esac 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+设置文件的执行权限
+
+chmod +x myredis
+1
+设置自启动还需要添加到chkconfig来管理
+
+chkconfig --add myredis
+chkconfig --list myredis
+1
+2
+使用
+
+service myredis start # 开启redis
+service myredis stop # 关闭redis
+
+
+reboot do  test 

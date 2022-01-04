@@ -1,0 +1,9 @@
+#!/bin/bash
+#chkconfig: 345 99 99
+#description:sp25-Student server
+#processname:sp25-Student
+case $1 in
+   start) /www/jarservice/SpringClound2/sp25-Student/sp.sh;; # 开启redis的命令   
+   stop) su root /www/jarservice/SpringClound2/sp25-Student/sp.sh;; # 启动杀死redis进程的脚本
+   *) echo "sp25-Student start|stop" ;;         
+esac 

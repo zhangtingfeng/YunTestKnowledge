@@ -6,8 +6,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.client.RestTemplate;
 
 @EnableFeignClients() //开启FeignClient客户端服务注解，如果引导类位置下有该包名，则不需要添加路径，如果没有，则需要手动添加路径
 @SpringBootApplication(exclude = {FreeMarkerAutoConfiguration.class})
@@ -17,6 +20,10 @@ public class Sp25StudentserviceApplication {
         SpringApplication.run(Sp25StudentserviceApplication.class, args);
     }
 
-
+    @LoadBalanced
+    @Bean
+    public RestTemplate templateEureka() {
+        return new RestTemplate();
+    }
 }
 

@@ -1,0 +1,9 @@
+#!/bin/bash
+#chkconfig: 345 99 99
+#description:sp24-teacherservice server
+#processname:sp24-teacherservice
+case $1 in
+   start) /www/jarservice/SpringClound2/sp24-teacherservice/sp.sh;; # 开启redis的命令   
+   stop) su root /www/jarservice/SpringClound2/sp24-teacherservice/sp.sh;; # 启动杀死redis进程的脚本
+   *) echo "sp24-teacherservice start|stop" ;;         
+esac 

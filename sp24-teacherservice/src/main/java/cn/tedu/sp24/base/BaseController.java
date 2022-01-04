@@ -1,11 +1,13 @@
 package cn.tedu.sp24.base;
 
 
+import cn.tedu.sp24.base.config.MongoServiceImpl;
 import cn.tedu.sp24.base.config.RedisServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestTemplate;
 
 public class BaseController {
 
@@ -23,4 +25,10 @@ public class BaseController {
 
     protected cn.tedu.sp0ag4studio.common.util.WebUtils webUtils;
 
+    @Autowired
+    protected RestTemplate templateEureka;
+
+
+    @Autowired
+    protected MongoServiceImpl mongoServiceImpl;
 }

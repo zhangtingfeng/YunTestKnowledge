@@ -45,7 +45,7 @@ spring:
     sampler:
       probability: 1.0   #2.0后percentage改为probability
   zipkin:
-    base-url: http://127.0.0.1:9411
+    base-url: http://219.235.0.112:9411
 
 
 server:
